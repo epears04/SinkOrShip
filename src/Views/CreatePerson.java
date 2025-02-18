@@ -1,13 +1,18 @@
 package Views;
 
+import Database.Connect;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.*;
 
 public class CreatePerson extends JFrame implements ActionListener {
     private Container c;
-    private JPanel panel;
     private boolean visibility = false;
     private JTextField nameField;
     private JTextField majorField;
@@ -15,6 +20,11 @@ public class CreatePerson extends JFrame implements ActionListener {
     private JTextField genderField;
     private JTextField imageUpload;
     private JTextField personalDescriptionField;
+    private JRadioButton maleButton;
+    private JRadioButton femaleButton;
+    private JRadioButton otherButton;
+    ButtonGroup group;
+    private static Color backgroundColor = new Color(223, 190, 239);
 
     public CreatePerson() {
         setTitle("Create Person");
@@ -25,10 +35,8 @@ public class CreatePerson extends JFrame implements ActionListener {
 
         c= getContentPane();
         c.setLayout(null);
-        c.setBackground(new Color(223, 190, 239));
+        c.setBackground(backgroundColor);
 
-        panel = new JPanel();
-        panel.setBackground(new Color(236, 152, 152));
 
         nameField = new JTextField();
         nameField.setSize(300, 30);
@@ -66,14 +74,36 @@ public class CreatePerson extends JFrame implements ActionListener {
         majorLabel.setSize(300, 40);
         c.add(majorLabel);
 
-        genderField = new JTextField();
-        genderField.setSize(300, 30);
-        genderField.setFont(new Font("Arial", Font.PLAIN, 15));
-        genderField.setLocation(350, 280);
-        c.add(genderField);
+//        genderField = new JTextField();
+//        genderField.setSize(300, 30);
+//        genderField.setFont(new Font("Arial", Font.PLAIN, 15));
+//        genderField.setLocation(350, 280);
+        maleButton = new JRadioButton("Male");
+        femaleButton = new JRadioButton("Female");
+        otherButton = new JRadioButton("Other");
+        maleButton.setSize(90, 30);
+        femaleButton.setSize(90, 30);
+        otherButton.setSize(90, 30);
+        int buttonDistance = 93;
+        maleButton.setLocation(360,280);
+        femaleButton.setLocation(maleButton.getX()+buttonDistance,280);
+        otherButton.setLocation(femaleButton.getX()+buttonDistance,280);
+        maleButton.setFont(new Font("Arial", Font.PLAIN, 15));
+        femaleButton.setFont(new Font("Arial", Font.PLAIN, 15));
+        otherButton.setFont(new Font("Arial", Font.PLAIN, 15));
+        maleButton.setBackground(backgroundColor);
+        femaleButton.setBackground(backgroundColor);
+        otherButton.setBackground(backgroundColor);
+        group = new ButtonGroup();
+        group.add(maleButton);
+        group.add(femaleButton);
+        group.add(otherButton);
+        c.add(maleButton);
+        c.add(femaleButton);
+        c.add(otherButton);
 
         JLabel genderLabel = new JLabel("Gender:");
-        genderLabel.setLocation(350, genderField.getY()-35);
+        genderLabel.setLocation(350, maleButton.getY()-35);
         genderLabel.setFont(new Font("Arial", Font.PLAIN, 15));
         genderLabel.setSize(300, 40);
         c.add(genderLabel);
@@ -107,6 +137,7 @@ public class CreatePerson extends JFrame implements ActionListener {
         submitButton.setSize(100, 30);
         submitButton.setLocation(450, 450);
         c.add(submitButton);
+
     }
 
     public void toggleShow(){
@@ -119,9 +150,40 @@ public class CreatePerson extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String s = e.getActionCommand();
         if (s.equals("Submit")) {
-            String inputUsername = nameField.getText();
-            System.out.println(inputUsername);
-            toggleShow();
+            try {
+                Connection connect = Connect.createConnection();
+                Statement statement = connect.createStatement();
+                StringBuilder sqlInsert = new StringBuilder();
+                sqlInsert.append("INSERT INTO People VALUES (");
+                sqlInsert.append("\"").append(nameField.getText()).append("\"");
+                sqlInsert.append(",");
+                sqlInsert.append(ageField.getText());
+                sqlInsert.append(",");
+                sqlInsert.append("\"").append(majorField.getText()).append("\"");
+                sqlInsert.append(",");
+                if(maleButton.isSelected()){
+                    sqlInsert.append("\"").append(maleButton.getText()).append("\"");
+                }
+                else if(femaleButton.isSelected()){
+                    sqlInsert.append("\"").append(femaleButton.getText()).append("\"");
+                }
+                else if(otherButton.isSelected()){
+                    sqlInsert.append("\"").append(otherButton.getText()).append("\"");
+                }else{
+                    sqlInsert.append("null");
+                }
+                sqlInsert.append(",");
+                sqlInsert.append("null ");
+                sqlInsert.append(",");
+                sqlInsert.append("\"").append(personalDescriptionField.getText()).append("\"");
+                sqlInsert.append(");");
+                String sqlSend = sqlInsert.toString();
+
+                int rowsAffected = statement.executeUpdate(sqlSend);
+            } catch (Exception ex) {
+                System.err.println("Failed to update table ");
+                ex.printStackTrace();
+            }
         }
     }
 }
