@@ -29,12 +29,12 @@ public class MainFrame extends JFrame {
         //cardLayout.show(mainPanel, "View");
 
         // Add drawer menu
-        DrawerPanel drawer = new DrawerPanel(this);
-        add(drawer, BorderLayout.WEST);
+        drawerPanel = new DrawerPanel(this);
+        add(drawerPanel, BorderLayout.WEST);
 
         // Toggle button (outside drawer)
         JButton toggleButton = new JButton("☰");
-        toggleButton.addActionListener(e -> drawer.toggleDrawer());
+        toggleButton.addActionListener(e -> drawerPanel.toggleDrawer());
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.add(toggleButton);
