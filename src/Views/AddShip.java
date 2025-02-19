@@ -1,8 +1,16 @@
 package Views;
 
+import Database.Connect;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class AddShip extends JFrame implements ActionListener {
     // Components of the Form
@@ -75,8 +83,6 @@ public class AddShip extends JFrame implements ActionListener {
         submit.setLocation(150, 300);
         submit.addActionListener(this);
         c.add(submit);
-
-        setVisible(true);
     }
 
     // Method actionPerformed()
@@ -84,7 +90,21 @@ public class AddShip extends JFrame implements ActionListener {
     // by the user and act accordingly
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == submit) {
-           System.out.println("Submitted");
+            LocalDate currentDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String formattedDate = currentDate.format(formatter);
+            String shipName = tShipName.getText();
+            try {
+                Connection connect = Connect.createConnection();
+                Statement statement = connect.createStatement();
+                String query = String.format(
+                        "INSERT INTO Ships (username1, username2, date_posted, ship_name) VALUES ('%s', '%s', '%s', '%s');",
+                        tPersonA.getText(), tPersonB.getText(), formattedDate, shipName);
+                statement.addBatch(query);
+                statement.executeBatch();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }
