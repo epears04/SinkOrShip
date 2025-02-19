@@ -1,10 +1,12 @@
+import Components.DrawerPanel;
 import Views.AddShip;
 import Views.CreatePerson;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class Main {
-//    public static final AddShip ADD_SHIP = new AddShip();
+    //    public static final AddShip ADD_SHIP = new AddShip();
     public static final CreatePerson CREATE_PERSON = new CreatePerson();
 
     public static void main(String[] args) {

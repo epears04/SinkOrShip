@@ -37,9 +37,6 @@ public class DrawerPanel extends JPanel {
         add(contentPanel, BorderLayout.CENTER);
 
         setVisible(false);
-
-        //not sure if this is correct:
-        parentFrame.add(toggleButton, BorderLayout.NORTH);
     }
 
     public void toggleDrawer() {
