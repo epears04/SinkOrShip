@@ -17,7 +17,6 @@ public class CreatePerson extends JFrame implements ActionListener {
     private JTextField nameField;
     private JTextField majorField;
     private JTextField ageField;
-    private JTextField genderField;
     private JTextField imageUpload;
     private JTextField personalDescriptionField;
     private JRadioButton maleButton;
@@ -74,10 +73,6 @@ public class CreatePerson extends JFrame implements ActionListener {
         majorLabel.setSize(300, 40);
         c.add(majorLabel);
 
-//        genderField = new JTextField();
-//        genderField.setSize(300, 30);
-//        genderField.setFont(new Font("Arial", Font.PLAIN, 15));
-//        genderField.setLocation(350, 280);
         maleButton = new JRadioButton("Male");
         femaleButton = new JRadioButton("Female");
         otherButton = new JRadioButton("Other");
@@ -151,39 +146,55 @@ public class CreatePerson extends JFrame implements ActionListener {
         String s = e.getActionCommand();
         if (s.equals("Submit")) {
             try {
-                Connection connect = Connect.createConnection();
-                Statement statement = connect.createStatement();
-                StringBuilder sqlInsert = new StringBuilder();
-                sqlInsert.append("INSERT INTO People VALUES (");
-                sqlInsert.append("\"").append(nameField.getText()).append("\"");
-                sqlInsert.append(",");
-                sqlInsert.append(ageField.getText());
-                sqlInsert.append(",");
-                sqlInsert.append("\"").append(majorField.getText()).append("\"");
-                sqlInsert.append(",");
-                if(maleButton.isSelected()){
-                    sqlInsert.append("\"").append(maleButton.getText()).append("\"");
-                }
-                else if(femaleButton.isSelected()){
-                    sqlInsert.append("\"").append(femaleButton.getText()).append("\"");
-                }
-                else if(otherButton.isSelected()){
-                    sqlInsert.append("\"").append(otherButton.getText()).append("\"");
-                }else{
-                    sqlInsert.append("null");
-                }
-                sqlInsert.append(",");
-                sqlInsert.append("null ");
-                sqlInsert.append(",");
-                sqlInsert.append("\"").append(personalDescriptionField.getText()).append("\"");
-                sqlInsert.append(");");
-                String sqlSend = sqlInsert.toString();
+                try{
+                    // Handling all constraints for people form
+                    int age = Integer.parseInt(ageField.getText());
+                    if (age <16)
+                        throw new Exception("User must be at least 13 years of age");
+                    String username = nameField.getText();
+                    if(username.length() < 8)
+                        throw new Exception("Username must be at least 8 characters");
 
-                int rowsAffected = statement.executeUpdate(sqlSend);
+                    // since the inputs fit the integrity constraints, we can make the sql insert
+                    Connection connect = Connect.createConnection();
+                    Statement statement = connect.createStatement();
+                    String sqlInsert = getSQLInsert(username, age);
+                    int rowsAffected = statement.executeUpdate(sqlInsert);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                    System.err.println(ex.getMessage());
+                }
+
             } catch (Exception ex) {
                 System.err.println("Failed to update table ");
                 ex.printStackTrace();
             }
+            // needs to link back to home page
+            //going to force link to Add SHip page for proof of functionality
+
+            this.toggleShow();
+            AddShip connectedFrame = new AddShip();
+
         }
+    }
+
+    private String getSQLInsert(String username, int age) {
+        String sqlInsert = "INSERT INTO People VALUES (\"%s\", %d, \"%s\", %s, null, \"%s\");";
+
+        // handles the gender related radio buttons
+        String gender;
+        if(maleButton.isSelected()){
+            gender = "\"male\"";
+        }
+        else if(femaleButton.isSelected()){
+            gender = "\"female\"";
+        }
+        else if(otherButton.isSelected()){
+            gender = "\"other\"";
+        }else{
+            gender = "null";
+        }
+        sqlInsert = String.format(sqlInsert, username, age, majorField.getText(), gender, personalDescriptionField.getText());
+        return sqlInsert;
     }
 }
