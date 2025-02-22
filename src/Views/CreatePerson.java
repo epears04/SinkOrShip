@@ -5,11 +5,11 @@ import Database.Connect;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.*;
+import java.sql.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class CreatePerson extends JFrame implements ActionListener {
     private Container c;
@@ -17,14 +17,15 @@ public class CreatePerson extends JFrame implements ActionListener {
     private JTextField nameField;
     private JTextField majorField;
     private JTextField ageField;
-    private JTextField genderField;
-    private JTextField imageUpload;
+    private JButton imageUpload;
     private JTextField personalDescriptionField;
     private JRadioButton maleButton;
     private JRadioButton femaleButton;
     private JRadioButton otherButton;
-    ButtonGroup group;
+    private ButtonGroup group;
     private static Color backgroundColor = new Color(223, 190, 239);
+    private JLabel uploaded;
+    private File uploadedImage = null;
 
     public CreatePerson() {
         setTitle("Create Person");
@@ -74,10 +75,6 @@ public class CreatePerson extends JFrame implements ActionListener {
         majorLabel.setSize(300, 40);
         c.add(majorLabel);
 
-//        genderField = new JTextField();
-//        genderField.setSize(300, 30);
-//        genderField.setFont(new Font("Arial", Font.PLAIN, 15));
-//        genderField.setLocation(350, 280);
         maleButton = new JRadioButton("Male");
         femaleButton = new JRadioButton("Female");
         otherButton = new JRadioButton("Other");
@@ -108,17 +105,31 @@ public class CreatePerson extends JFrame implements ActionListener {
         genderLabel.setSize(300, 40);
         c.add(genderLabel);
 
-        imageUpload = new JTextField();
-        imageUpload.setSize(300, 30);
+//        imageUpload = new JTextField();
+//        imageUpload.setSize(300, 30);
+//        c.add(imageUpload);
+
+        imageUpload = new JButton("Choose Image");
+        imageUpload.setSize(100, 30);
         imageUpload.setFont(new Font("Arial", Font.PLAIN, 15));
         imageUpload.setLocation(350, 340);
+        imageUpload.addActionListener(this);
         c.add(imageUpload);
+
 
         JLabel imageUploadLabel = new JLabel("Image Upload:");
         imageUploadLabel.setLocation(350, imageUpload.getY()-35);
         imageUploadLabel.setFont(new Font("Arial", Font.PLAIN, 15));
         imageUploadLabel.setSize(300, 40);
         c.add(imageUploadLabel);
+
+        uploaded = new JLabel("Done!");
+        uploaded.setFont(new Font("Arial", Font.PLAIN, 15));
+        uploaded.setForeground(Color.GREEN);
+        uploaded.setSize(300, 40);
+        uploaded.setLocation(480, 340);
+        uploaded.setVisible(false);
+        c.add(uploaded);
 
         personalDescriptionField = new JTextField();
         personalDescriptionField.setSize(300, 30);
@@ -150,40 +161,124 @@ public class CreatePerson extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String s = e.getActionCommand();
         if (s.equals("Submit")) {
-            try {
+            try{
+                // Handling all constraints for people form
+                int age = Integer.parseInt(ageField.getText());
+                if (age <13)
+                    throw new Exception("User must be at least 13 years of age");
+                String username = nameField.getText();
+                if(username.length() < 3)
+                    throw new Exception("Username must be at least 8 characters");
+
+                // since the inputs fit the integrity constraints, we can make the sql insert
                 Connection connect = Connect.createConnection();
                 Statement statement = connect.createStatement();
-                StringBuilder sqlInsert = new StringBuilder();
-                sqlInsert.append("INSERT INTO People VALUES (");
-                sqlInsert.append("\"").append(nameField.getText()).append("\"");
-                sqlInsert.append(",");
-                sqlInsert.append(ageField.getText());
-                sqlInsert.append(",");
-                sqlInsert.append("\"").append(majorField.getText()).append("\"");
-                sqlInsert.append(",");
-                if(maleButton.isSelected()){
-                    sqlInsert.append("\"").append(maleButton.getText()).append("\"");
+                String sqlInsert = getSQLInsert(username, age);
+                int rowsAffected;
+                if (uploadedImage == null) {
+                    rowsAffected = statement.executeUpdate(sqlInsert);
                 }
-                else if(femaleButton.isSelected()){
-                    sqlInsert.append("\"").append(femaleButton.getText()).append("\"");
+                else{
+                    if(attachImageAndSend(sqlInsert, connect) == 0){
+                        return; // something failed so dont move forward to the home page
+                    }
                 }
-                else if(otherButton.isSelected()){
-                    sqlInsert.append("\"").append(otherButton.getText()).append("\"");
-                }else{
-                    sqlInsert.append("null");
-                }
-                sqlInsert.append(",");
-                sqlInsert.append("null ");
-                sqlInsert.append(",");
-                sqlInsert.append("\"").append(personalDescriptionField.getText()).append("\"");
-                sqlInsert.append(");");
-                String sqlSend = sqlInsert.toString();
 
-                int rowsAffected = statement.executeUpdate(sqlSend);
-            } catch (Exception ex) {
-                System.err.println("Failed to update table ");
+            }catch (Exception ex){
+
+                //can use "JOptionPane" to help display error messages and breaking of integrity constraints
                 ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+                return;
             }
+
+
+
+            // needs to link back to home page
+            //going to force link to Add SHip page for proof of functionality
+
+            this.toggleShow();
+            AddShip connectedFrame = new AddShip();
+
         }
+        // used to handle the addition of an image to the profile
+        else if (s.equals("Choose Image")) {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new FileNameExtensionFilter("PNG Images", "png", "jpg"));
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+            int returnVal = fileChooser.showOpenDialog(this);
+
+            if (returnVal == JFileChooser.APPROVE_OPTION) { // 0 if successful
+                uploadedImage = fileChooser.getSelectedFile();
+                uploaded.setVisible(true);
+            }else {
+                uploaded.setText("Failed");
+                uploaded.setForeground(Color.RED);
+                uploaded.setVisible(true);
+            }
+            JOptionPane.showMessageDialog(null, uploadedImage);
+
+        }
+    }
+
+    private String getSQLInsert(String username, int age) {
+        String sqlInsert;
+        if (uploadedImage == null){
+             sqlInsert= "INSERT INTO People VALUES (\"%s\", %d, \"%s\", %s, null, \"%s\");";
+        }else{
+            sqlInsert = "INSERT INTO People VALUES (\"%s\", %d, \"%s\", %s, ?, \"%s\");";
+        }
+
+        // handles the gender related radio buttons
+        String gender;
+        if(maleButton.isSelected()){
+            gender = "\"male\"";
+        }
+        else if(femaleButton.isSelected()){
+            gender = "\"female\"";
+        }
+        else if(otherButton.isSelected()){
+            gender = "\"other\"";
+        }else{
+            gender = "\"none\"";
+        }
+        sqlInsert = String.format(sqlInsert, username, age, majorField.getText(), gender, personalDescriptionField.getText());
+        return sqlInsert;
+    }
+
+    private int attachImageAndSend(String preparedSql, Connection connect) {
+//        String selectedFileName = uploadedImage.getName();
+        String imagePath = uploadedImage.getAbsolutePath();
+//        ImageIcon imageIcon = new ImageIcon(imagePath);
+
+//        Image img = imageIcon.getImage();
+//        Image scaledImage = img.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+
+        //JLabel.setIcon(new Image(scaledImage); -> just needs an actual JLabel to work in theory
+        //now to actually store in database
+        try{
+            FileInputStream fis = new FileInputStream(imagePath);
+            PreparedStatement pst = connect.prepareStatement(preparedSql);
+            pst.setBinaryStream(1, fis);
+            System.out.println(pst);
+            int response = JOptionPane.showConfirmDialog(rootPane, "Are u sure", "Confirm...", JOptionPane.YES_NO_OPTION);
+            if(response == JOptionPane.YES_OPTION){//==0
+                int record = pst.executeUpdate();
+                if(record == 1){
+                    JOptionPane.showMessageDialog(rootPane, "You have successfully added person");
+                    return record;
+                }else {
+                    throw new SQLException();
+                }
+            }else if (response == JOptionPane.NO_OPTION){
+                System.out.println("cancelled by user");
+                return 0;
+            }
+
+        }catch(Exception ex){
+            ex.printStackTrace();
+            System.err.println(ex.getMessage());
+        }
+        return 0;
     }
 }
