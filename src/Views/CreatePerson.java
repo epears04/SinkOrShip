@@ -167,7 +167,7 @@ public class CreatePerson extends JFrame implements ActionListener {
                 if (age <13)
                     throw new Exception("User must be at least 13 years of age");
                 String username = nameField.getText();
-                if(username.length() < 8)
+                if(username.length() < 3)
                     throw new Exception("Username must be at least 8 characters");
 
                 // since the inputs fit the integrity constraints, we can make the sql insert
@@ -188,7 +188,7 @@ public class CreatePerson extends JFrame implements ActionListener {
 
                 //can use "JOptionPane" to help display error messages and breaking of integrity constraints
                 ex.printStackTrace();
-                System.err.println(ex.getMessage());
+                JOptionPane.showMessageDialog(this, ex.getMessage());
                 return;
             }
 
@@ -216,6 +216,8 @@ public class CreatePerson extends JFrame implements ActionListener {
                 uploaded.setForeground(Color.RED);
                 uploaded.setVisible(true);
             }
+            JOptionPane.showMessageDialog(null, uploadedImage);
+
         }
     }
 
