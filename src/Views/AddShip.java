@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class AddShip extends JFrame implements ActionListener {
+public class AddShip extends JPanel implements ActionListener {
     // Components of the Form
     private Container c;
     private JLabel title;
@@ -19,13 +19,10 @@ public class AddShip extends JFrame implements ActionListener {
     // Constructor, to initialize the components
     // with default values.
     public AddShip() {
-        setTitle("Add Ships");
         setBounds(300, 90, 900, 600);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setResizable(false);
 
-        c = getContentPane();
-        c.setLayout(null);
+        c = this;
+        c.setLayout(new FlowLayout());
 
         title = new JLabel("Add a Ship!");
         title.setFont(new Font("Arial", Font.PLAIN, 30));
