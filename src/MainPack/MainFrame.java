@@ -1,3 +1,5 @@
+package MainPack;
+
 import Components.DrawerPanel;
 import Views.AddShip;
 import Views.CreatePerson;
