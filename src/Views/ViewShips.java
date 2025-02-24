@@ -6,8 +6,10 @@ import java.awt.*;
 public class ViewShips extends JFrame {
 
     private JPanel panel;
+    private static int ship_count = 0;
 
     public ViewShips() {
+        ship_count++;
         setTitle("View Ships");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 1000);
@@ -49,14 +51,32 @@ public class ViewShips extends JFrame {
 
         JPanel votePanel = new JPanel();
         votePanel.setLayout(new BoxLayout(votePanel, BoxLayout.X_AXIS));
+
         ImageIcon upIcon = new ImageIcon("images/up-arrow.png");
         Image scaledUpImage = upIcon.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
         upIcon = new ImageIcon(scaledUpImage);
         ImageIcon downIcon = new ImageIcon("images/down-arrow.png");
         Image scaledDownImage = downIcon.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
         downIcon = new ImageIcon(scaledDownImage);
-        JButton upButton = new JButton(upIcon);
-        JButton downButton = new JButton(downIcon);
+
+        ImageIcon upSelectedIcon = new ImageIcon("images/selected-up-arrow.png");
+        Image scaledUpSelectedIcon = upSelectedIcon.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
+        upSelectedIcon = new ImageIcon(scaledUpSelectedIcon);
+        ImageIcon downSelectedIcon = new ImageIcon("images/selected-down-arrow.png");
+        Image scaledDownSelectedIcon = downSelectedIcon.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
+        downSelectedIcon = new ImageIcon(scaledDownSelectedIcon);
+
+
+
+        JRadioButton upButton = new JRadioButton(upIcon);
+        upButton.setSelectedIcon(upSelectedIcon);
+        JRadioButton downButton = new JRadioButton(downIcon);
+        downButton.setSelectedIcon(downSelectedIcon);
+
+        ButtonGroup shipButtonGroup = new ButtonGroup();
+        shipButtonGroup.add(upButton);
+        shipButtonGroup.add(downButton);
+
         votePanel.add(upButton);
         votePanel.add(Box.createHorizontalStrut(5));
         votePanel.add(downButton);
