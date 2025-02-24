@@ -6,14 +6,14 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Main {
-    //    public static final AddShip ADD_SHIP = new AddShip();
-    public static final CreatePerson CREATE_PERSON = new CreatePerson();
+        public static final AddShip ADD_SHIP = new AddShip();
+//    public static final CreatePerson CREATE_PERSON = new CreatePerson();
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                CREATE_PERSON.toggleShow();
+                ADD_SHIP.show();
             }
         });
     }

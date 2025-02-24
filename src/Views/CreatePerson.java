@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.sql.*;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -23,9 +22,12 @@ public class CreatePerson extends JFrame implements ActionListener {
     private JRadioButton femaleButton;
     private JRadioButton otherButton;
     private ButtonGroup group;
-    private static Color backgroundColor = new Color(223, 190, 239);
+    private static final Color backgroundColor = new Color(223, 190, 239);
     private JLabel uploaded;
     private File uploadedImage = null;
+    private static final int minUserAge = 13;
+    private static final int minUsernameLength = 3;
+    private static final int maxUsernameLength = 20;
 
     public CreatePerson() {
         setTitle("Create Person");
@@ -164,11 +166,11 @@ public class CreatePerson extends JFrame implements ActionListener {
             try{
                 // Handling all constraints for people form
                 int age = Integer.parseInt(ageField.getText());
-                if (age <13)
-                    throw new Exception("User must be at least 13 years of age");
+                if (age <minUserAge)
+                    throw new Exception("User must be at least " + minUserAge + " years  of age");
                 String username = nameField.getText();
-                if(username.length() < 3)
-                    throw new Exception("Username must be at least 8 characters");
+                if(username.length() < minUsernameLength|| username.length()>maxUsernameLength)
+                    throw new Exception("Username must be between " + minUsernameLength + " and " + maxUsernameLength + " characters");
 
                 // since the inputs fit the integrity constraints, we can make the sql insert
                 Connection connect = Connect.createConnection();
