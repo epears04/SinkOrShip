@@ -84,7 +84,9 @@ public class AddShip extends JFrame implements ActionListener {
     // by the user and act accordingly
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == submit) {
-           System.out.println("Submitted");
+           JOptionPane.showMessageDialog(this, "Submitted");
         }
     }
+
+
 }
