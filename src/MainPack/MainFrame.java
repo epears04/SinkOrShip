@@ -3,6 +3,7 @@ package MainPack;
 import Components.DrawerPanel;
 import Views.AddShip;
 import Views.CreatePerson;
+import Views.ViewShips;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +15,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame(){
         setTitle("SinkorShip");
-        setSize(600, 400);
+        setSize(1000, 1000);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -23,7 +24,7 @@ public class MainFrame extends JFrame {
         mainPanel = new JPanel(cardLayout);
 
         // Add different pages
-        //mainPanel.add(new ViewShips(), "View");
+        mainPanel.add(new ViewShips(), "View");
         mainPanel.add(new AddShip(), "Add");
         mainPanel.add(new CreatePerson(), "Person");
 
