@@ -29,7 +29,7 @@ public class MainFrame extends JFrame {
         mainPanel.add(new CreatePerson(), "Person");
 
         // Show View Ships by default
-        //cardLayout.show(mainPanel, "View");
+        cardLayout.show(mainPanel, "View");
 
         // Add drawer menu
         drawerPanel = new DrawerPanel(this);
