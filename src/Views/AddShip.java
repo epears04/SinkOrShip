@@ -2,6 +2,11 @@ package Views;
 
 import Database.Connect;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.sql.Blob;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -81,7 +86,7 @@ public class AddShip extends JFrame implements ActionListener {
 
         personAImage = new JLabel();
         personAImage.setSize(150, 150);
-        personAImage.setLocation(520, 300);
+        personAImage.setLocation(200, 250);
         c.add(personAImage);
         personAImage.setVisible(false);
 
@@ -106,14 +111,14 @@ public class AddShip extends JFrame implements ActionListener {
 
         personBImage = new JLabel();
         personBImage.setSize(150, 150);
-        personBImage.setLocation(350, 300);
+        personBImage.setLocation(350, 250);
         c.add(personBImage);
         personBImage.setVisible(false);
 
         submit = new JButton("Submit");
         submit.setFont(new Font("Arial", Font.PLAIN, 15));
         submit.setSize(100, 20);
-        submit.setLocation(150, 300);
+        submit.setLocation(150, 450);
         submit.addActionListener(this);
         c.add(submit);
     }
@@ -140,8 +145,10 @@ public class AddShip extends JFrame implements ActionListener {
                 throw new RuntimeException(ex);
             }
         }
-        else if (e.getSource() == searchPersonA || e.getSource() == searchPersonB) {
-            searchPersonFetchImage(e);
+        else if (e.getSource() == searchPersonA) {
+            searchPersonFetchImage(tPersonA.getText(), personAImage);
+        } else if (e.getSource() == searchPersonB) {
+            searchPersonFetchImage(tPersonB.getText(), personBImage);
         }
     }
 
@@ -157,46 +164,33 @@ public class AddShip extends JFrame implements ActionListener {
         }
     }
 
-    private void searchPersonFetchImage(ActionEvent e ){
+    private void searchPersonFetchImage(String person, JLabel personImage) {
         Connection connect = getConnection();
         try {
             Statement statement = connect.createStatement();
-            String nameQuery;
-            if(e.getSource() == searchPersonA) {
-                nameQuery= "SELECT username, profile_pic from People where username = \"" + tPersonA.getText() + "\";";
-            }else{
-                nameQuery= "SELECT username, profile_pic from People where username = \"" + tPersonB.getText() + "\";";
-            }
-            ResultSet rs = statement.executeQuery(nameQuery);
+            ResultSet rs = statement.executeQuery("SELECT username, profile_pic from People where username = \"" + person + "\";");
 
-            InputStream input;
-            FileOutputStream output;
-            File theFile = new File("images/heartPixel.png");
-            output = new FileOutputStream(theFile);
             if (rs.next()) {
                 //TODO: send user message that the person was found in the database (variable based on the desired search)
                 //TODO: Print out the person's profile_photo (if available)
-                input = rs.getBinaryStream("profile_pic");
-                byte buffer[] = new byte[1024];
-                while(input.read(buffer)>0){
-                    output.write(buffer);
+                Blob blob = rs.getBlob("profile_pic");
+                byte[] byteArr = blob.getBytes(1,(int)blob.length());
+
+                // Convert byte array to Image
+                ByteArrayInputStream bais = new ByteArrayInputStream(byteArr);
+                BufferedImage img = ImageIO.read(bais);
+
+                if (img != null) {
+                    // Resize image to match JLabel size
+                    Image scaledImg = img.getScaledInstance(personImage.getWidth(), personImage.getHeight(), Image.SCALE_SMOOTH);
+                    ImageIcon icon = new ImageIcon(scaledImg);
+
+                    // Set the image to the JLabel
+                    personImage.setIcon(icon);
+                    personImage.setVisible(true);
+                } else {
+                    System.out.println("Failed to read image from byte array.");
                 }
-                String path = theFile.getAbsolutePath();
-                ImageIcon image = new ImageIcon(path);
-                Image img = image.getImage();
-                Image newImage = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-                ImageIcon newImageIcon = new ImageIcon(newImage);
-                if (e.getSource() == searchPersonA) {
-                    personAImage.setIcon(newImageIcon);
-                    personA.setVisible(true);
-                }else{
-                    personBImage.setIcon(newImageIcon);
-                    personB.setVisible(true);
-                }
-                System.out.println("success");
-            }else {
-                //TODO: send message that the person WAS NOT found
-                JOptionPane.showMessageDialog(this, "No such person");
             }
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
