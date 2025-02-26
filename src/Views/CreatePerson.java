@@ -10,7 +10,7 @@ import java.sql.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class CreatePerson extends JFrame implements ActionListener {
+public class CreatePerson extends JPanel implements ActionListener {
     private Container c;
     private boolean visibility = false;
     private JTextField nameField;
@@ -30,14 +30,11 @@ public class CreatePerson extends JFrame implements ActionListener {
     private static final int maxUsernameLength = 20;
 
     public CreatePerson() {
-        setTitle("Create Person");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //ensures that the frame actually closes all the way when clicking X
         setBounds(30, 60, 1000, 1000);
-        setResizable(false);
-        setLocationRelativeTo(null); //centers on screen
 
-        c= getContentPane();
-        c.setLayout(null);
+
+        c= this;
+        c.setLayout(new FlowLayout());
         c.setBackground(backgroundColor);
 
 
@@ -263,11 +260,11 @@ public class CreatePerson extends JFrame implements ActionListener {
             PreparedStatement pst = connect.prepareStatement(preparedSql);
             pst.setBinaryStream(1, fis);
             System.out.println(pst);
-            int response = JOptionPane.showConfirmDialog(rootPane, "Are u sure", "Confirm...", JOptionPane.YES_NO_OPTION);
+            int response = JOptionPane.showConfirmDialog(this, "Are u sure", "Confirm...", JOptionPane.YES_NO_OPTION);
             if(response == JOptionPane.YES_OPTION){//==0
                 int record = pst.executeUpdate();
                 if(record == 1){
-                    JOptionPane.showMessageDialog(rootPane, "You have successfully added person");
+                    JOptionPane.showMessageDialog(this, "You have successfully added person");
                     return record;
                 }else {
                     throw new SQLException();
