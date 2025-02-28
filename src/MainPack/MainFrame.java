@@ -2,6 +2,7 @@ package MainPack;
 
 import Components.DrawerPanel;
 import Views.AddShip;
+import Views.CommentsPage;
 import Views.CreatePerson;
 import Views.ViewShips;
 
@@ -27,6 +28,7 @@ public class MainFrame extends JFrame {
         mainPanel.add(new ViewShips(), "View");
         mainPanel.add(new AddShip(), "Add");
         mainPanel.add(new CreatePerson(), "Person");
+        mainPanel.add(new CommentsPage(), "Comments");
 
         // Show View Ships by default
         //cardLayout.show(mainPanel, "View");

@@ -34,7 +34,7 @@ public class DrawerPanel extends JPanel {
         contentPanel.add(createShip);
 
         JButton comment = new JButton("Leave Comment");
-        comment.addActionListener(e -> mainFrame.showPage("Comment"));
+        comment.addActionListener(e -> mainFrame.showPage("Comments"));
         contentPanel.add(comment);
 
         add(contentPanel, BorderLayout.CENTER);
