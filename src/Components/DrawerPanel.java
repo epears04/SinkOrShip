@@ -30,7 +30,7 @@ public class DrawerPanel extends JPanel {
         contentPanel.add(createPerson);
 
         JButton createShip = new JButton("Create Ship");
-        createShip.addActionListener(e -> mainFrame.showPage("add"));
+        createShip.addActionListener(e -> mainFrame.showPage("Add"));
         contentPanel.add(createShip);
 
         JButton comment = new JButton("Leave Comment");
