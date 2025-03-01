@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Main {
-        public static final CommentsPage write_comment = new CommentsPage();
+        public static final CommentsPage write_comment = new CommentsPage("Sobear");
 //    public static final CreatePerson CREATE_PERSON = new CreatePerson();
 
     public static void main(String[] args) {

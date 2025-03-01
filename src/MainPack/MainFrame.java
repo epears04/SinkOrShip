@@ -28,10 +28,10 @@ public class MainFrame extends JFrame {
         mainPanel.add(new ViewShips(), "View");
         mainPanel.add(new AddShip(), "Add");
         mainPanel.add(new CreatePerson(), "Person");
-        mainPanel.add(new CommentsPage(), "Comments");
+        mainPanel.add(new CommentsPage("Sobear"), "Comments");
 
         // Show View Ships by default
-        cardLayout.show(mainPanel, "View");
+        cardLayout.show(mainPanel, "Comments");
 
         // Add drawer menu
         drawerPanel = new DrawerPanel(this);
