@@ -58,7 +58,7 @@ public class AddShip extends JPanel implements ActionListener {
 
         tShipName = new JTextField();
         tShipName.setFont(new Font("Arial", Font.PLAIN, 15));
-        tShipName.setSize(300, 30);
+        tShipName.setPreferredSize(new Dimension(300, 30));
         tShipName.setLocation(200, 100);
         c.add(tShipName);
 
@@ -70,7 +70,7 @@ public class AddShip extends JPanel implements ActionListener {
 
         tPersonA = new JTextField();
         tPersonA.setFont(new Font("Arial", Font.PLAIN, 15));
-        tPersonA.setSize(300, 30);
+        tPersonA.setPreferredSize(new Dimension(300, 30));
         tPersonA.setLocation(200, 150);
         c.add(tPersonA);
 
@@ -95,7 +95,7 @@ public class AddShip extends JPanel implements ActionListener {
 
         tPersonB = new JTextField();
         tPersonB.setFont(new Font("Arial", Font.PLAIN, 15));
-        tPersonB.setSize(300, 30);
+        tPersonB.setPreferredSize(new Dimension(300,30));
         tPersonB.setLocation(200, 200);
         c.add(tPersonB);
 
