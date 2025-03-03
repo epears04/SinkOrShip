@@ -17,7 +17,7 @@ public class CreatePerson extends JPanel implements ActionListener {
     private JTextField majorField;
     private JTextField ageField;
     private JButton imageUpload;
-    private JTextField personalDescriptionField;
+    private JTextArea personalDescriptionField;
     private JRadioButton maleButton;
     private JRadioButton femaleButton;
     private JRadioButton otherButton;
@@ -30,124 +30,112 @@ public class CreatePerson extends JPanel implements ActionListener {
     private static final int maxUsernameLength = 20;
 
     public CreatePerson() {
-        setBounds(30, 60, 1000, 1000);
+        setLayout(new GridBagLayout()); // Use GridBagLayout
+        setBackground(backgroundColor);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 5, 10, 5); // Small padding
+        gbc.fill = GridBagConstraints.CENTER; // Expand components center
+        gbc.ipadx = 0; // No extra width
+        gbc.weightx = 0.1; // Keep labels small
+        gbc.gridx = 0;
+        gbc.gridy = 0;
 
-
-        c= this;
-        c.setLayout(new FlowLayout());
-        c.setBackground(backgroundColor);
-
-
-        nameField = new JTextField();
-        nameField.setSize(300, 30);
-        nameField.setLocation(350, 100);
-        nameField.setFont(new Font("Arial", Font.PLAIN, 15));
-        c.add(nameField);
-
+        // Name Label
         JLabel nameLabel = new JLabel("Username:");
-        nameLabel.setLocation(350, nameField.getY()-35);
-        nameLabel.setFont(new Font("Arial", Font.PLAIN, 15));
-        nameLabel.setSize(300, 40);
-        c.add(nameLabel);
+        add(nameLabel, gbc);
 
-        ageField = new JTextField();
-        ageField.setSize(300, 30);
-        ageField.setLocation(350, 160);
-        ageField.setFont(new Font("Arial", Font.PLAIN, 15));
-        c.add(ageField);
+        // Name Field
+        gbc.gridx = 1;
+        nameField = new JTextField(20); // Set size via columns
+        add(nameField, gbc);
 
+        // Age Label
+        gbc.gridx = 0;
+        gbc.gridy++;
         JLabel ageLabel = new JLabel("Age:");
-        ageLabel.setLocation(350, ageField.getY()-35);
-        ageLabel.setFont(new Font("Arial", Font.PLAIN, 15));
-        ageLabel.setSize(300, 40);
-        c.add(ageLabel);
+        add(ageLabel, gbc);
 
-        majorField = new JTextField();
-        majorField.setSize(300, 30);
-        majorField.setLocation(350, 220);
-        majorField.setFont(new Font("Arial", Font.PLAIN, 15));
-        c.add(majorField);
+        // Age Field
+        gbc.gridx = 1;
+        ageField = new JTextField(20);
+        add(ageField, gbc);
 
+        // Major Label
+        gbc.gridx = 0;
+        gbc.gridy++;
         JLabel majorLabel = new JLabel("Major:");
-        majorLabel.setLocation(350, majorField.getY()-35);
-        majorLabel.setFont(new Font("Arial", Font.PLAIN, 15));
-        majorLabel.setSize(300, 40);
-        c.add(majorLabel);
+        add(majorLabel, gbc);
 
+        // Major Field
+        gbc.gridx = 1;
+        majorField = new JTextField(20);
+        add(majorField, gbc);
+
+        // Gender Label
+        gbc.gridx = 0;
+        gbc.gridy++;
+        JLabel genderLabel = new JLabel("Gender:");
+        add(genderLabel, gbc);
+
+        // Gender Buttons
+        gbc.gridx = 1;
+        JPanel genderPanel = new JPanel();
+        genderPanel.setBackground(backgroundColor);
         maleButton = new JRadioButton("Male");
-        femaleButton = new JRadioButton("Female");
-        otherButton = new JRadioButton("Other");
-        maleButton.setSize(90, 30);
-        femaleButton.setSize(90, 30);
-        otherButton.setSize(90, 30);
-        int buttonDistance = 93;
-        maleButton.setLocation(360,280);
-        femaleButton.setLocation(maleButton.getX()+buttonDistance,280);
-        otherButton.setLocation(femaleButton.getX()+buttonDistance,280);
-        maleButton.setFont(new Font("Arial", Font.PLAIN, 15));
-        femaleButton.setFont(new Font("Arial", Font.PLAIN, 15));
-        otherButton.setFont(new Font("Arial", Font.PLAIN, 15));
         maleButton.setBackground(backgroundColor);
+        femaleButton = new JRadioButton("Female");
         femaleButton.setBackground(backgroundColor);
+        otherButton = new JRadioButton("Other");
         otherButton.setBackground(backgroundColor);
         group = new ButtonGroup();
         group.add(maleButton);
         group.add(femaleButton);
         group.add(otherButton);
-        c.add(maleButton);
-        c.add(femaleButton);
-        c.add(otherButton);
+        genderPanel.add(maleButton);
+        genderPanel.add(femaleButton);
+        genderPanel.add(otherButton);
+        add(genderPanel, gbc);
 
-        JLabel genderLabel = new JLabel("Gender:");
-        genderLabel.setLocation(350, maleButton.getY()-35);
-        genderLabel.setFont(new Font("Arial", Font.PLAIN, 15));
-        genderLabel.setSize(300, 40);
-        c.add(genderLabel);
-
-//        imageUpload = new JTextField();
-//        imageUpload.setSize(300, 30);
-//        c.add(imageUpload);
-
-        imageUpload = new JButton("Choose Image");
-        imageUpload.setSize(100, 30);
-        imageUpload.setFont(new Font("Arial", Font.PLAIN, 15));
-        imageUpload.setLocation(350, 340);
-        imageUpload.addActionListener(this);
-        c.add(imageUpload);
-
-
+        // Image Upload Label
+        gbc.gridx = 0;
+        gbc.gridy++;
         JLabel imageUploadLabel = new JLabel("Image Upload:");
-        imageUploadLabel.setLocation(350, imageUpload.getY()-35);
-        imageUploadLabel.setFont(new Font("Arial", Font.PLAIN, 15));
-        imageUploadLabel.setSize(300, 40);
-        c.add(imageUploadLabel);
+        add(imageUploadLabel, gbc);
 
+        // Image Upload Button
+        gbc.gridx = 1;
+        imageUpload = new JButton("Choose Image");
+        imageUpload.addActionListener(this);
+        add(imageUpload, gbc);
+
+        // Uploaded Label (Hidden initially)
+        gbc.gridx = 2;
         uploaded = new JLabel("Done!");
-        uploaded.setFont(new Font("Arial", Font.PLAIN, 15));
         uploaded.setForeground(Color.GREEN);
-        uploaded.setSize(300, 40);
-        uploaded.setLocation(480, 340);
         uploaded.setVisible(false);
-        c.add(uploaded);
+        add(uploaded, gbc);
 
-        personalDescriptionField = new JTextField();
-        personalDescriptionField.setSize(300, 30);
-        personalDescriptionField.setFont(new Font("Arial", Font.PLAIN, 15));
-        personalDescriptionField.setLocation(350, 400);
-        c.add(personalDescriptionField);
-
+        // Personal Description Label
+        gbc.gridx = 0;
+        gbc.gridy++;
         JLabel personalDescriptionLabel = new JLabel("Personal Description:");
-        personalDescriptionLabel.setLocation(350, personalDescriptionField.getY()-35);
-        personalDescriptionLabel.setFont(new Font("Arial", Font.PLAIN, 15));
-        personalDescriptionLabel.setSize(300, 40);
-        c.add(personalDescriptionLabel);
+        add(personalDescriptionLabel, gbc);
 
+        // Personal Description Field
+        gbc.gridx = 1;
+        personalDescriptionField = new JTextArea(5, 20); // 5 rows, 20 columns
+        personalDescriptionField.setLineWrap(true);  // Enable text wrapping
+        personalDescriptionField.setWrapStyleWord(true);
+        JScrollPane scrollPane = new JScrollPane(personalDescriptionField);
+        scrollPane.setPreferredSize(new Dimension(300, 100)); // Set width & height
+        add(scrollPane, gbc);
+
+        // Submit Button
+        gbc.gridx = 1;
+        gbc.gridy++;
         JButton submitButton = new JButton("Submit");
         submitButton.addActionListener(this);
-        submitButton.setSize(100, 30);
-        submitButton.setLocation(450, 450);
-        c.add(submitButton);
-
+        add(submitButton, gbc);
     }
 
     public void toggleShow(){
@@ -179,10 +167,19 @@ public class CreatePerson extends JPanel implements ActionListener {
                 }
                 else{
                     if(attachImageAndSend(sqlInsert, connect) == 0){
-                        return; // something failed so dont move forward to the home page
+                        return; // something failed so don't move forward to the home page
                     }
                 }
-
+                // Clear text fields
+                nameField.setText("");
+                ageField.setText("");
+                majorField.setText("");
+                personalDescriptionField.setText("");
+                // Clear radio button selection
+                group.clearSelection();
+                // Hide "Uploaded" label (if needed)
+                uploaded.setVisible(false);
+                JOptionPane.showMessageDialog(this, "Submitted");
             }catch (Exception ex){
 
                 //can use "JOptionPane" to help display error messages and breaking of integrity constraints
