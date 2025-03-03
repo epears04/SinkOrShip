@@ -1,183 +1,203 @@
 package Views;
 
+import Components.AutoCompletion;
 import Database.Connect;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.sql.Blob;
+import java.sql.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
-public class AddShip extends JPanel implements ActionListener {
+public class AddShip extends JPanel {
     // Components of the Form
-    private Container c;
-    private JLabel title;
-    private JLabel shipName;
+    private JLabel title, shipName, personA, personB, personFeedback, personAImage, personBImage;
     private JTextField tShipName;
-    private JLabel personA;
-    private JTextField tPersonA;
-    private JButton searchPersonA;
-    private JLabel personAImage;
-    private JLabel personB;
-    private JTextField tPersonB;
-    private JButton searchPersonB;
-    private JLabel personBImage;
-    private JButton submit;
+    private JComboBox tPersonA, tPersonB;
+    private JButton searchPersonA, searchPersonB, submit;
+    private static Color backgroundColor = new Color(223, 190, 239);
+    private List<Object> people = fetchPeople();
 
     // Constructor, to initialize the components
     // with default values.
     public AddShip() {
-        setBounds(300, 90, 900, 600);
-
-        c = this;
-        c.setLayout(new FlowLayout());
+        setLayout(new GridBagLayout());
+        setBackground(backgroundColor);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Padding around components
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         title = new JLabel("Add a Ship!");
-        title.setFont(new Font("Arial", Font.PLAIN, 30));
-        title.setSize(300, 30);
-        title.setLocation(300, 30);
-        c.add(title);
+        title.setFont(new Font("Arial", Font.BOLD, 24));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2; // Span across 2 columns
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(title, gbc);
 
-        shipName = new JLabel("Ship Name");
-        shipName.setFont(new Font("Arial", Font.PLAIN, 20));
-        shipName.setSize(100, 20);
-        shipName.setLocation(100, 100);
-        c.add(shipName);
+        // Ship Name Row
+        shipName = new JLabel("Ship Name:");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        add(shipName, gbc);
 
-        tShipName = new JTextField();
-        tShipName.setFont(new Font("Arial", Font.PLAIN, 15));
-        tShipName.setPreferredSize(new Dimension(300, 30));
-        tShipName.setLocation(200, 100);
-        c.add(tShipName);
+        tShipName = new JTextField(20);
+        gbc.gridx = 1;
+        add(tShipName, gbc);
 
-        personA = new JLabel("Person 1");
-        personA.setFont(new Font("Arial", Font.PLAIN, 20));
-        personA.setSize(100, 20);
-        personA.setLocation(100, 150);
-        c.add(personA);
+        // Person A Row
+        personA = new JLabel("Person 1:");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        add(personA, gbc);
 
-        tPersonA = new JTextField();
-        tPersonA.setFont(new Font("Arial", Font.PLAIN, 15));
-        tPersonA.setPreferredSize(new Dimension(300, 30));
-        tPersonA.setLocation(200, 150);
-        c.add(tPersonA);
+        tPersonA = new JComboBox();
+        AutoCompletion.enable(tPersonA);
+        gbc.gridx = 1;
+        add(tPersonA, gbc);
 
         searchPersonA = new JButton("Search");
-        searchPersonA.setFont(new Font("Arial", Font.PLAIN, 12));
-        searchPersonA.setSize(75, 20);
-        searchPersonA.setLocation(530, 155);
-        c.add(searchPersonA);
-        searchPersonA.addActionListener(this);
+        gbc.gridx = 2;
+        add(searchPersonA, gbc);
 
+        searchPersonA.addActionListener(e -> {
+            searchPersonFetchImage((String) tPersonA.getSelectedItem(), personAImage);
+        });
+
+        // Person A Image
         personAImage = new JLabel();
-        personAImage.setSize(150, 150);
-        personAImage.setLocation(200, 250);
-        c.add(personAImage);
-        personAImage.setVisible(false);
+        personAImage.setPreferredSize(new Dimension(100, 100));
+        personAImage.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        gbc.gridx = 3;
+        add(personAImage, gbc);
 
-        personB = new JLabel("Person 2");
-        personB.setFont(new Font("Arial", Font.PLAIN, 20));
-        personB.setSize(100, 20);
-        personB.setLocation(100, 200);
-        c.add(personB);
+        // Person B Row
+        personB = new JLabel("Person 2:");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        add(personB, gbc);
 
-        tPersonB = new JTextField();
-        tPersonB.setFont(new Font("Arial", Font.PLAIN, 15));
-        tPersonB.setPreferredSize(new Dimension(300,30));
-        tPersonB.setLocation(200, 200);
-        c.add(tPersonB);
+        tPersonB = new JComboBox();
+        AutoCompletion.enable(tPersonB);
+        gbc.gridx = 1;
+        add(tPersonB, gbc);
 
         searchPersonB = new JButton("Search");
-        searchPersonB.setFont(new Font("Arial", Font.PLAIN, 12));
-        searchPersonB.setSize(75, 20);
-        searchPersonB.setLocation(530, 205);
-        c.add(searchPersonB);
-        searchPersonB.addActionListener(this);
+        gbc.gridx = 2;
+        add(searchPersonB, gbc);
 
+        searchPersonB.addActionListener(e -> {
+            searchPersonFetchImage((String) tPersonB.getSelectedItem(), personBImage);
+        });
+
+        // Person B Image
         personBImage = new JLabel();
-        personBImage.setSize(150, 150);
-        personBImage.setLocation(350, 250);
-        c.add(personBImage);
-        personBImage.setVisible(false);
+        personBImage.setPreferredSize(new Dimension(100, 100));
+        personBImage.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        gbc.gridx = 3;
+        add(personBImage, gbc);
 
+        personFeedback = new JLabel();
+        personFeedback.setPreferredSize(new Dimension(200, 20));
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        add(personFeedback, gbc);
+
+        // Submit Button
         submit = new JButton("Submit");
-        submit.setFont(new Font("Arial", Font.PLAIN, 15));
-        submit.setSize(100, 20);
-        submit.setLocation(150, 450);
-        submit.addActionListener(this);
-        c.add(submit);
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(submit, gbc);
+
+        submit.addActionListener(e -> {
+            submit();
+        });
+
+        // Populate Person A & Person B JComboBox
+        for (Object person : people) {
+            tPersonA.addItem(person);
+            tPersonB.addItem(person);
+        }
+        tPersonA.setSelectedItem("");
+        tPersonB.setSelectedItem("");
     }
 
-    // Method actionPerformed()
-    // to get the action performed
-    // by the user and act accordingly
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == submit) {
-            JOptionPane.showMessageDialog(this, "Submitted");
-            LocalDate currentDate = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            String formattedDate = currentDate.format(formatter);
-            String shipName = tShipName.getText();
-            try {
-                Connection connect = Connect.createConnection();
-                Statement statement = connect.createStatement();
-                String query = String.format(
-                        "INSERT INTO Ships (username1, username2, date_posted, ship_name) VALUES ('%s', '%s', '%s', '%s');",
-                        tPersonA.getText(), tPersonB.getText(), formattedDate, shipName);
-                statement.addBatch(query);
-                statement.executeBatch();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        else if (e.getSource() == searchPersonA) {
-            searchPersonFetchImage(tPersonA.getText(), personAImage);
-        } else if (e.getSource() == searchPersonB) {
-            searchPersonFetchImage(tPersonB.getText(), personBImage);
-        }
-    }
-
-    private Connection getConnection(){
+    private List<Object> fetchPeople() {
+        String query = "SELECT username FROM People";
+        List<Object> people = new ArrayList<>();
         try {
-            return Connect.createConnection();
+            Connection connect = Connect.createConnection();
+            Statement statement = connect.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+
+            while (rs.next()) {
+                people.add(rs.getString("username"));
+            }
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            ex.printStackTrace();
         }
-        catch (SQLException e) {
-            System.out.println("Connection Error");
-            System.err.println(e.getMessage());
-            e.printStackTrace();
-            return null;
+        return people;
+    }
+
+    public void submit() {
+        if (tPersonA.getSelectedItem() == null || tPersonB.getSelectedItem() == null || tShipName.getText().isEmpty()) {
+            personFeedback.setText("Please fill in all fields.");
+            return;
+        }
+
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = currentDate.format(formatter);
+        String query = String.format(
+                "INSERT INTO Ships (username1, username2, date_posted, ship_name) VALUES ('%s', '%s', '%s', '%s');",
+                tPersonA.getSelectedItem(), tPersonB.getSelectedItem(), formattedDate, tShipName.getText());
+        try {
+            Connection connect = Connect.createConnection();
+            Statement statement = connect.createStatement();
+            statement.addBatch(query);
+            statement.executeBatch();
+            clearFields();
+            JOptionPane.showMessageDialog(this, "Submitted");
+        } catch (BatchUpdateException bue) {
+            if (bue.getErrorCode() == 1062) {
+                personFeedback.setText("This ship name already exists!");
+            } else {
+                personFeedback.setText("Uh oh, this ship can't go through");
+                System.err.println("Batch Update Error: " + bue.getMessage());
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
     private void searchPersonFetchImage(String person, JLabel personImage) {
-        Connection connect = getConnection();
+        String query = "SELECT username, profile_pic from People where username = \"" + person + "\";";
         try {
+            Connection connect = Connect.createConnection();
             Statement statement = connect.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT username, profile_pic from People where username = \"" + person + "\";");
+            ResultSet rs = statement.executeQuery(query);
 
             if (rs.next()) {
-                //TODO: send user message that the person was found in the database (variable based on the desired search)
-                //TODO: Print out the person's profile_photo (if available)
+                personFeedback.setText("");
                 Blob blob = rs.getBlob("profile_pic");
-                byte[] byteArr = blob.getBytes(1,(int)blob.length());
+                if (blob != null) {
+                    byte[] byteArr = blob.getBytes(1,(int)blob.length());
 
-                // Convert byte array to Image
-                ByteArrayInputStream bais = new ByteArrayInputStream(byteArr);
-                BufferedImage img = ImageIO.read(bais);
+                    // Convert byte array to Image
+                    ByteArrayInputStream bais = new ByteArrayInputStream(byteArr);
+                    BufferedImage img = ImageIO.read(bais);
 
-                if (img != null) {
                     // Resize image to match JLabel size
                     Image scaledImg = img.getScaledInstance(personImage.getWidth(), personImage.getHeight(), Image.SCALE_SMOOTH);
                     ImageIcon icon = new ImageIcon(scaledImg);
@@ -186,8 +206,11 @@ public class AddShip extends JPanel implements ActionListener {
                     personImage.setIcon(icon);
                     personImage.setVisible(true);
                 } else {
-                    System.out.println("Failed to read image from byte array.");
+                    personImage.setText("No Image Found");
+                    personImage.setFont(new Font("Arial", Font.ITALIC, 13));
                 }
+            } else {
+                personFeedback.setText(person + " doesn't exist!");
             }
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
@@ -195,5 +218,19 @@ public class AddShip extends JPanel implements ActionListener {
         }
     }
 
+    private void clearFields() {
+        tShipName.setText("");
+        tPersonA.setSelectedItem("");
+        tPersonB.setSelectedItem("");
 
+        // Clear images
+        personAImage.setIcon(null);
+        personAImage.setText(""); // Remove "No Image Found" text if present
+
+        personBImage.setIcon(null);
+        personBImage.setText("");
+
+        // Clear feedback label
+        personFeedback.setText("");
+    }
 }
