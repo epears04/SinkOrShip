@@ -20,7 +20,7 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class AddShip extends JPanel implements ActionListener {
+public class AddShip extends JPanel {
     // Components of the Form
     private JLabel title, shipName, personA, personB, personAImage, personBImage;
     private JTextField tShipName, tPersonA, tPersonB;
@@ -67,6 +67,10 @@ public class AddShip extends JPanel implements ActionListener {
         gbc.gridx = 2;
         add(searchPersonA, gbc);
 
+        searchPersonA.addActionListener(e -> {
+            searchPersonFetchImage(tPersonA.getText(), personAImage);
+        });
+
         // Person A Image
         personAImage = new JLabel();
         personAImage.setPreferredSize(new Dimension(100, 100));
@@ -88,6 +92,10 @@ public class AddShip extends JPanel implements ActionListener {
         gbc.gridx = 2;
         add(searchPersonB, gbc);
 
+        searchPersonB.addActionListener(e -> {
+            searchPersonFetchImage(tPersonB.getText(), personBImage);
+        });
+
         // Person B Image
         personBImage = new JLabel();
         personBImage.setPreferredSize(new Dimension(100, 100));
@@ -102,54 +110,36 @@ public class AddShip extends JPanel implements ActionListener {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         add(submit, gbc);
+
+        submit.addActionListener(e -> {
+            submit();
+        });
     }
 
-    // Method actionPerformed()
-    // to get the action performed
-    // by the user and act accordingly
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == submit) {
-            JOptionPane.showMessageDialog(this, "Submitted");
-            LocalDate currentDate = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            String formattedDate = currentDate.format(formatter);
-            String shipName = tShipName.getText();
-            try {
-                Connection connect = Connect.createConnection();
-                Statement statement = connect.createStatement();
-                String query = String.format(
-                        "INSERT INTO Ships (username1, username2, date_posted, ship_name) VALUES ('%s', '%s', '%s', '%s');",
-                        tPersonA.getText(), tPersonB.getText(), formattedDate, shipName);
-                statement.addBatch(query);
-                statement.executeBatch();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        else if (e.getSource() == searchPersonA) {
-            searchPersonFetchImage(tPersonA.getText(), personAImage);
-        } else if (e.getSource() == searchPersonB) {
-            searchPersonFetchImage(tPersonB.getText(), personBImage);
-        }
-    }
-
-    private Connection getConnection(){
+    public void submit() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = currentDate.format(formatter);
+        String query = String.format(
+                "INSERT INTO Ships (username1, username2, date_posted, ship_name) VALUES ('%s', '%s', '%s', '%s');",
+                tPersonA.getText(), tPersonB.getText(), formattedDate, tShipName.getText());
         try {
-            return Connect.createConnection();
+            Connection connect = Connect.createConnection();
+            Statement statement = connect.createStatement();
+            statement.addBatch(query);
+            statement.executeBatch();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
         }
-        catch (SQLException e) {
-            System.out.println("Connection Error");
-            System.err.println(e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
+        JOptionPane.showMessageDialog(this, "Submitted");
     }
 
     private void searchPersonFetchImage(String person, JLabel personImage) {
-        Connection connect = getConnection();
+        String query = "SELECT username, profile_pic from People where username = \"" + person + "\";";
         try {
+            Connection connect = Connect.createConnection();
             Statement statement = connect.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT username, profile_pic from People where username = \"" + person + "\";");
+            ResultSet rs = statement.executeQuery(query);
 
             if (rs.next()) {
                 //TODO: send user message that the person was found in the database (variable based on the desired search)
@@ -178,6 +168,4 @@ public class AddShip extends JPanel implements ActionListener {
             ex.printStackTrace();
         }
     }
-
-
 }
