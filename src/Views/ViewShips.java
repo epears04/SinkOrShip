@@ -66,12 +66,10 @@ public class ViewShips extends JPanel {
         commentButton.setContentAreaFilled(false);
         commentButton.setBorderPainted(false);
         commentButton.setFocusPainted(false);
-        commentButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mainFrame.getMainPanel().add(new CommentsPage(shipName), "Comments");
-                mainFrame.showPage("Comments");
-            }
+        commentButton.addActionListener(e->{
+            mainFrame.getMainPanel().add(new CommentsPage(shipName), "Comments");
+            mainFrame.showPage("Comments");
+
         });
 
         // make a panel for vote buttons

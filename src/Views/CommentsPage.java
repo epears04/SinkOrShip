@@ -139,6 +139,10 @@ public class CommentsPage extends JPanel implements ActionListener {
                 int updateFromSQL = statement.executeUpdate(sentInsert);
                 if (updateFromSQL > 0) {
                     addPostedComment(shipName, commenterTextField.getText(),commentEntry.getText(), String.valueOf(LocalDate.now()));
+                    commenterTextField.setText("");
+                    commentEntry.setText("");
+                }else{
+                    throw new Exception("error posting comment to database. Please Try Again.");
                 }
             }catch (Exception ex){
                 JOptionPane.showMessageDialog(null, ex.getMessage());
@@ -211,9 +215,15 @@ public class CommentsPage extends JPanel implements ActionListener {
     private void fetchComments(String shipName) {
         try {
             Connection connect = Connect.createConnection();
-            String query = "SELECT comment, commenter, date_posted FROM Comments WHERE Sid = (SELECT sid FROM Ships WHERE ship_name = \"" + shipName + "\");";
+            String query = "SELECT comment, commenter, date_posted FROM Comments WHERE Sid = (SELECT sid FROM Ships WHERE ship_name = \"" + shipName + "\") order by date_posted desc;";
             PreparedStatement statement = connect.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
+            if(!resultSet.isBeforeFirst()){
+                JLabel noCommentsLabel = new JLabel("No comments found");
+                noCommentsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+                noCommentsLabel.setForeground(Color.GRAY);
+                panel.add(noCommentsLabel, BorderLayout.NORTH);
+            }
             while (resultSet.next()) {
                 String commenter = resultSet.getString("commenter");
                 String comment = resultSet.getString("comment");
