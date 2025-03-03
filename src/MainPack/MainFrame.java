@@ -25,13 +25,13 @@ public class MainFrame extends JFrame {
         mainPanel = new JPanel(cardLayout);
 
         // Add different pages
-        mainPanel.add(new ViewShips(), "View");
+        mainPanel.add(new ViewShips(this), "View");
         mainPanel.add(new AddShip(), "Add");
         mainPanel.add(new CreatePerson(), "Person");
-        mainPanel.add(new CommentsPage("Sobear"), "Comments");
+//        mainPanel.add(new CommentsPage("Sobear"), "Comments");
 
         // Show View Ships by default
-        cardLayout.show(mainPanel, "Comments");
+        cardLayout.show(mainPanel, "View");
 
         // Add drawer menu
         drawerPanel = new DrawerPanel(this);
@@ -57,5 +57,9 @@ public class MainFrame extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
+    }
+
+    public JPanel getMainPanel() {
+        return mainPanel;
     }
 }
