@@ -7,9 +7,80 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
-import java.util.jar.JarEntry;
+import java.util.Map;
+import java.util.*;
 
 public class ViewShips extends JPanel {
+    private class ButtonActionListener implements ActionListener{
+        private JRadioButton prevSelectedButton;
+        private JRadioButton upButton;
+        private JRadioButton downButton;
+        private int sid;
+        private JLabel votesLabel;
+        private ImageIcon downSelectedIcon;
+        private ImageIcon upSelectedIcon;
+        private ImageIcon upIcon;
+        private ImageIcon downIcon;
+
+        public ButtonActionListener(JRadioButton prevSelectedButton, JRadioButton upButton, JRadioButton downButton, int sid, JLabel votesLabel, ImageIcon downSelectedIcon, ImageIcon upSelectedIcon, ImageIcon downIcon, ImageIcon upIcon) {
+            this.prevSelectedButton = prevSelectedButton;
+            this.upButton = upButton;
+            this.downButton = downButton;
+            this.sid = sid;
+            this.votesLabel = votesLabel;
+            this.downSelectedIcon = downSelectedIcon;
+            this.upSelectedIcon = upSelectedIcon;
+            this.downIcon = downIcon;
+            this.upIcon = upIcon;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int voteQuant = 0;
+            if(this.upButton == e.getSource() && prevSelectedButton == null){
+                //no selected -> up selected
+                // increment by 1
+                prevSelectedButton = upButton;
+                upButton.setIcon(upSelectedIcon);
+                voteQuant = 1;
+            }else if (this.downButton == e.getSource() && prevSelectedButton == null){
+                // no selected -> down selected
+                // increment by -1
+                prevSelectedButton = downButton;
+                downButton.setIcon(downSelectedIcon);
+                voteQuant = -1;
+            }else if(prevSelectedButton == upButton && e.getSource() == downButton){
+                //switch from up -> down
+                //increment by -2
+                prevSelectedButton = downButton;
+                upButton.setIcon(upIcon);
+                downButton.setIcon(downSelectedIcon);
+                voteQuant = -2;
+            } else if (prevSelectedButton == downButton && e.getSource() == upButton) {
+                //switch from down -> up
+                // increment by 2
+                prevSelectedButton = upButton;
+                downButton.setIcon(downIcon);
+                upButton.setIcon(upSelectedIcon);
+                voteQuant = 2;
+            } else if(this.prevSelectedButton == e.getSource() && e.getSource() == downButton){
+                //deselect down
+                // increment by 1 to reset to 0
+                prevSelectedButton = null;
+                downButton.setSelected(false);
+                downButton.setIcon(downIcon);
+                voteQuant = 1;
+            } else if (this.prevSelectedButton == e.getSource() && e.getSource() == upButton) {
+                //deselect up
+                // increment by -1 to reset to 0
+                prevSelectedButton = null;
+                upButton.setSelected(false);
+                upButton.setIcon(upIcon);
+                voteQuant = -1;
+            }
+            handleVote(sid, voteQuant, votesLabel);
+        }
+    }
 
     private JPanel panel;
     private static Color backgroundColor = new Color(223, 190, 239);
@@ -94,16 +165,62 @@ public class ViewShips extends JPanel {
 
         // add buttons to vote panel
         JRadioButton upButton = new JRadioButton(upIcon);
-        upButton.setSelectedIcon(upSelectedIcon);
         JRadioButton downButton = new JRadioButton(downIcon);
-        downButton.setSelectedIcon(downSelectedIcon);
 
-        upButton.addActionListener(e -> {
-            handleVote(sid, 1, votesLabel);
-        });
-        downButton.addActionListener(e -> {
-            handleVote(sid, -1, votesLabel);
-        });
+        JRadioButton prevSelectedButton = null;
+
+        ViewShips.ButtonActionListener actionListener = new ButtonActionListener(prevSelectedButton, upButton, downButton, sid, votesLabel, downSelectedIcon, upSelectedIcon, downIcon, upIcon);
+
+        upButton.addActionListener(actionListener);
+        downButton.addActionListener(actionListener);
+
+//        final Map<JRadioButton, JRadioButton> prevSelectedButtonMap = new HashMap<>();
+//        prevSelectedButtonMap.put(upButton, null);
+//        prevSelectedButtonMap.put(downButton, null);
+
+//        ActionListener listener = new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                JRadioButton selectedButton = (JRadioButton) e.getSource();
+//                JRadioButton prevSelectedButton = prevSelectedButtonMap.get(selectedButton);
+//
+//                if (selectedButton == upButton) {
+//                    if (prevSelectedButton != upButton) {
+//                        handleVote(sid, 1, votesLabel);
+//                        prevSelectedButtonMap.put(upButton, upButton);
+//                        prevSelectedButtonMap.put(downButton, null); // Reset other button
+//                    } else {
+//                        handleVote(sid, 0, votesLabel);
+//                        prevSelectedButtonMap.put(upButton, null);
+//                    }
+//                } else if (selectedButton == downButton) {
+//                    if (prevSelectedButton != downButton) {
+//                        handleVote(sid, -1, votesLabel);
+//                        prevSelectedButtonMap.put(downButton, downButton);
+//                        prevSelectedButtonMap.put(upButton, null); // Reset other button
+//                    } else {
+//                        handleVote(sid, 0, votesLabel);
+//                        prevSelectedButtonMap.put(downButton, null);
+//                    }
+//                }
+//            }
+//        };
+
+//        ImageIcon finalUpSelectedIcon = upSelectedIcon;
+//        upButton.addActionListener(e->{
+//            if(!downButton.isEnabled()) handleVote(sid, 2, votesLabel);
+//            else handleVote(sid, 1, votesLabel);
+//            downButton.setEnabled(true);
+//            upButton.setEnabled(false);
+//            upButton.setDisabledIcon(finalUpSelectedIcon);
+//        });
+//        ImageIcon finalDownSelectedIcon = downSelectedIcon;
+//        downButton.addActionListener(e->{
+//            if(!upButton.isEnabled()) handleVote(sid, -2, votesLabel);
+//            else handleVote(sid, -1, votesLabel);
+//            downButton.setEnabled(false);
+//            upButton.setEnabled(true);
+//            downButton.setDisabledIcon(finalDownSelectedIcon);
+//        });
 
         ButtonGroup shipButtonGroup = new ButtonGroup();
         shipButtonGroup.add(upButton);
