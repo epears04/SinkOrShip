@@ -6,9 +6,15 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 public class CommentsPage extends JPanel implements ActionListener {
+    private String shipName;
     private JPanel panel;
     private JPanel commenterNamePanel;
     private JTextField commenterTextField;
@@ -19,6 +25,7 @@ public class CommentsPage extends JPanel implements ActionListener {
     private boolean visibility = false;
 
     public CommentsPage(String shipName) {
+        this.shipName = shipName;
         setLayout(new BorderLayout());
 
         // set up main panel
@@ -27,31 +34,71 @@ public class CommentsPage extends JPanel implements ActionListener {
         panel.setBackground(backgroundColor);
         panel.setBorder(BorderFactory.createLineBorder(backgroundColor, 20));
 
-        commenterNamePanel = new JPanel(new BorderLayout());
-        commenterNamePanel.setLayout(new BoxLayout(commenterNamePanel, BoxLayout.X_AXIS));
-        commenterNamePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 400));
-        commenterNamePanel.setMinimumSize(new Dimension(800, 40));
-        commenterNamePanel.setMaximumSize(new Dimension(800, 40));
-        commenterNamePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        commenterNamePanel = new JPanel();
+        commenterNamePanel.setLayout(new BorderLayout());
+        commenterNamePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        JLabel nameLabel = new JLabel("Name: ", JLabel.LEFT);
+        Dimension namePanelSize = new Dimension(800, 40);
+
+        commenterNamePanel.setPreferredSize(namePanelSize);
+        commenterNamePanel.setMaximumSize(namePanelSize);
+        commenterNamePanel.setMinimumSize(namePanelSize);
+
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.X_AXIS));
+        leftPanel.setOpaque(false);
+
+        JLabel nameLabel = new JLabel("Name: ", JLabel.RIGHT);
         nameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        //Add name label and restructure
-        commenterNamePanel.add(nameLabel, BorderLayout.WEST);
-        commenterNamePanel.add(Box.createHorizontalStrut(5));
-
         commenterTextField = new JTextField();
-        commenterTextField.setMaximumSize(new Dimension(300, 25)); // Limits width
-        commenterTextField.setPreferredSize(new Dimension(200, 25)); // Preferred width
-        commenterTextField.setMinimumSize(new Dimension(200, 25)); // Ensures it doesn't shrink too much
-        commenterNamePanel.add(commenterTextField, BorderLayout.WEST);
+        commenterTextField.setPreferredSize(new Dimension(400, 25)); // Limits width
 
-        panel.add(commenterNamePanel, BorderLayout.WEST);
+        commenterTextField.setBorder(new CompoundBorder(new LineBorder(Color.BLACK, 1), new EmptyBorder(0, 2, 0, 0)));
+//        commenterTextField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+//        commenterTextField.setBorder(BorderFactory.createEmptyBorder(0,2,0,0));
+        commenterNamePanel.add(commenterTextField, BorderLayout.CENTER);
+
+        leftPanel.add(nameLabel);
+        leftPanel.add(Box.createHorizontalStrut(5));
+        leftPanel.add(commenterTextField);
+
+
+        //Add name label and restructure
+        commenterNamePanel.add(leftPanel, BorderLayout.WEST);
+        commenterNamePanel.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
+
+        panel.add(commenterNamePanel, BorderLayout.NORTH);
 
         writtenCommentPanel = new JPanel();
         writtenCommentPanel.setLayout(new BoxLayout(writtenCommentPanel, BoxLayout.Y_AXIS));
-//        writtenCommentPanel.add(commenterTextField);
+        writtenCommentPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        Dimension commentPanelSize = new Dimension(800, 150);
+
+        writtenCommentPanel.setPreferredSize(commentPanelSize);
+        writtenCommentPanel.setMaximumSize(commentPanelSize);
+        writtenCommentPanel.setMinimumSize(commentPanelSize);
+
+        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel commentEntryLabel = new JLabel("Comment: ", JLabel.RIGHT);
+        commentEntryLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        labelPanel.add(commentEntryLabel);
+        writtenCommentPanel.add(labelPanel);
+
+        commentEntry = new JTextArea(3, 40);
+        commentEntry.setBorder(new CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1), new EmptyBorder(0, 2, 0, 0)));
+
+        writtenCommentPanel.add(commentEntry);
+        writtenCommentPanel.add(Box.createVerticalStrut(5));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        saveButton = new JButton("Post Comment");
+
+        buttonPanel.add(saveButton);
+        writtenCommentPanel.add(buttonPanel);
+
+        panel.add(writtenCommentPanel, BorderLayout.CENTER);
 
 
         panel.add(Box.createVerticalStrut(30));
@@ -59,6 +106,7 @@ public class CommentsPage extends JPanel implements ActionListener {
         add(scrollPane, BorderLayout.CENTER);
 
         fetchComments(shipName);
+        saveButton.addActionListener(this);
         setVisible(true);
     }
 
@@ -73,10 +121,28 @@ public class CommentsPage extends JPanel implements ActionListener {
         if (s.equals("Submit")) {
             // needs to link back to home page
             //going to force link to Add SHip page for proof of functionality
-
             this.toggleShow();
             AddShip connectedFrame = new AddShip();
+        }
+        else if (s.equals("Post Comment")){
+            try{
+                Connection connect = Connect.createConnection();
 
+                PreparedStatement statement = connect.prepareStatement("select sid from Ships where ship_name = \"" + shipName + "\"");
+                ResultSet resultSet = statement.executeQuery();
+                resultSet.next();
+                int sid = resultSet.getInt("sid");
+                LocalDate currentDate = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String formattedDate = currentDate.format(formatter);
+                String sentInsert = "insert into Comments (sid, comment, commenter, date_posted) values (" + sid + ", \"" +  commentEntry.getText() + "\", \"" + commenterTextField.getText() +  "\", \"" + currentDate + "\");";
+                int updateFromSQL = statement.executeUpdate(sentInsert);
+                if (updateFromSQL > 0) {
+                    addPostedComment(shipName, commenterTextField.getText(),commentEntry.getText(), String.valueOf(LocalDate.now()));
+                }
+            }catch (Exception ex){
+                JOptionPane.showMessageDialog(null, ex.getMessage());
+            }
         }
     }
 
