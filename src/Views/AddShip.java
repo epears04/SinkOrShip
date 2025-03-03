@@ -22,102 +22,86 @@ import java.time.format.DateTimeFormatter;
 
 public class AddShip extends JPanel implements ActionListener {
     // Components of the Form
-    private Container c;
-    private JLabel title;
-    private JLabel shipName;
-    private JTextField tShipName;
-    private JLabel personA;
-    private JTextField tPersonA;
-    private JButton searchPersonA;
-    private JLabel personAImage;
-    private JLabel personB;
-    private JTextField tPersonB;
-    private JButton searchPersonB;
-    private JLabel personBImage;
-    private JButton submit;
+    private JLabel title, shipName, personA, personB, personAImage, personBImage;
+    private JTextField tShipName, tPersonA, tPersonB;
+    private JButton searchPersonA, searchPersonB, submit;
 
     // Constructor, to initialize the components
     // with default values.
     public AddShip() {
-        setBounds(300, 90, 900, 600);
-
-        c = this;
-        c.setLayout(new FlowLayout());
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Padding around components
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         title = new JLabel("Add a Ship!");
-        title.setFont(new Font("Arial", Font.PLAIN, 30));
-        title.setSize(300, 30);
-        title.setLocation(300, 30);
-        c.add(title);
+        title.setFont(new Font("Arial", Font.BOLD, 24));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2; // Span across 2 columns
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(title, gbc);
 
-        shipName = new JLabel("Ship Name");
-        shipName.setFont(new Font("Arial", Font.PLAIN, 20));
-        shipName.setSize(100, 20);
-        shipName.setLocation(100, 100);
-        c.add(shipName);
+        // Ship Name Row
+        shipName = new JLabel("Ship Name:");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        add(shipName, gbc);
 
-        tShipName = new JTextField();
-        tShipName.setFont(new Font("Arial", Font.PLAIN, 15));
-        tShipName.setPreferredSize(new Dimension(300, 30));
-        tShipName.setLocation(200, 100);
-        c.add(tShipName);
+        tShipName = new JTextField(20);
+        gbc.gridx = 1;
+        add(tShipName, gbc);
 
-        personA = new JLabel("Person 1");
-        personA.setFont(new Font("Arial", Font.PLAIN, 20));
-        personA.setSize(100, 20);
-        personA.setLocation(100, 150);
-        c.add(personA);
+        // Person A Row
+        personA = new JLabel("Person 1:");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        add(personA, gbc);
 
-        tPersonA = new JTextField();
-        tPersonA.setFont(new Font("Arial", Font.PLAIN, 15));
-        tPersonA.setPreferredSize(new Dimension(300, 30));
-        tPersonA.setLocation(200, 150);
-        c.add(tPersonA);
+        tPersonA = new JTextField(15);
+        gbc.gridx = 1;
+        add(tPersonA, gbc);
 
         searchPersonA = new JButton("Search");
-        searchPersonA.setFont(new Font("Arial", Font.PLAIN, 12));
-        searchPersonA.setSize(75, 20);
-        searchPersonA.setLocation(530, 155);
-        c.add(searchPersonA);
-        searchPersonA.addActionListener(this);
+        gbc.gridx = 2;
+        add(searchPersonA, gbc);
 
+        // Person A Image
         personAImage = new JLabel();
-        personAImage.setSize(150, 150);
-        personAImage.setLocation(200, 250);
-        c.add(personAImage);
-        personAImage.setVisible(false);
+        personAImage.setPreferredSize(new Dimension(100, 100));
+        personAImage.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        gbc.gridx = 3;
+        add(personAImage, gbc);
 
-        personB = new JLabel("Person 2");
-        personB.setFont(new Font("Arial", Font.PLAIN, 20));
-        personB.setSize(100, 20);
-        personB.setLocation(100, 200);
-        c.add(personB);
+        // Person B Row
+        personB = new JLabel("Person 2:");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        add(personB, gbc);
 
-        tPersonB = new JTextField();
-        tPersonB.setFont(new Font("Arial", Font.PLAIN, 15));
-        tPersonB.setPreferredSize(new Dimension(300,30));
-        tPersonB.setLocation(200, 200);
-        c.add(tPersonB);
+        tPersonB = new JTextField(15);
+        gbc.gridx = 1;
+        add(tPersonB, gbc);
 
         searchPersonB = new JButton("Search");
-        searchPersonB.setFont(new Font("Arial", Font.PLAIN, 12));
-        searchPersonB.setSize(75, 20);
-        searchPersonB.setLocation(530, 205);
-        c.add(searchPersonB);
-        searchPersonB.addActionListener(this);
+        gbc.gridx = 2;
+        add(searchPersonB, gbc);
 
+        // Person B Image
         personBImage = new JLabel();
-        personBImage.setSize(150, 150);
-        personBImage.setLocation(350, 250);
-        c.add(personBImage);
-        personBImage.setVisible(false);
+        personBImage.setPreferredSize(new Dimension(100, 100));
+        personBImage.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        gbc.gridx = 3;
+        add(personBImage, gbc);
 
+        // Submit Button
         submit = new JButton("Submit");
-        submit.setFont(new Font("Arial", Font.PLAIN, 15));
-        submit.setSize(100, 20);
-        submit.setLocation(150, 450);
-        submit.addActionListener(this);
-        c.add(submit);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(submit, gbc);
     }
 
     // Method actionPerformed()
