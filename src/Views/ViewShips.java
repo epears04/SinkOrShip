@@ -1,6 +1,8 @@
 package Views;
 
 import Database.Connect;
+import MainPack.MainFrame;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -11,8 +13,10 @@ public class ViewShips extends JPanel {
 
     private JPanel panel;
     private static Color backgroundColor = new Color(223, 190, 239);
+    private static MainFrame mainFrame;
 
-    public ViewShips() {
+    public ViewShips(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
         setLayout(new BorderLayout());
 
         // set up main panel
@@ -48,6 +52,27 @@ public class ViewShips extends JPanel {
         labelPanel.add(dateLabel);
         labelPanel.add(Box.createVerticalStrut(5));
         labelPanel.add(votesLabel);
+
+        JPanel commentConnectionPanel = new JPanel();
+        commentConnectionPanel.setLayout(new BoxLayout(commentConnectionPanel, BoxLayout.Y_AXIS));
+
+        ImageIcon commentIcon = new ImageIcon("images/comment_icon.png");
+        Image scaledCommentImage = commentIcon.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
+        commentIcon = new ImageIcon(scaledCommentImage);
+        JButton commentButton = new JButton(commentIcon);
+        commentConnectionPanel.add(commentButton);
+
+        commentButton.setOpaque(false);
+        commentButton.setContentAreaFilled(false);
+        commentButton.setBorderPainted(false);
+        commentButton.setFocusPainted(false);
+        commentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainFrame.getMainPanel().add(new CommentsPage(shipName), "Comments");
+                mainFrame.showPage("Comments");
+            }
+        });
 
         // make a panel for vote buttons
         JPanel votePanel = new JPanel();
@@ -92,6 +117,7 @@ public class ViewShips extends JPanel {
 
         // set up ship component
         shipPanel.add(labelPanel, BorderLayout.WEST);
+        shipPanel.add(commentConnectionPanel, BorderLayout.CENTER);
         shipPanel.add(votePanel, BorderLayout.EAST);
 
         // add component to main panel
