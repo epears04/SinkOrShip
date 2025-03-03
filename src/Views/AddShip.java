@@ -1,5 +1,6 @@
 package Views;
 
+import Components.AutoCompletion;
 import Database.Connect;
 
 import java.awt.image.BufferedImage;
@@ -8,16 +9,21 @@ import java.sql.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddShip extends JPanel {
     // Components of the Form
     private JLabel title, shipName, personA, personB, personFeedback, personAImage, personBImage;
-    private JTextField tShipName, tPersonA, tPersonB;
+    private JTextField tShipName;
+    private JComboBox tPersonA, tPersonB;
     private JButton searchPersonA, searchPersonB, submit;
     private static Color backgroundColor = new Color(223, 190, 239);
+    private List<Object> people = fetchPeople();
 
     // Constructor, to initialize the components
     // with default values.
@@ -53,7 +59,8 @@ public class AddShip extends JPanel {
         gbc.gridy = 2;
         add(personA, gbc);
 
-        tPersonA = new JTextField(15);
+        tPersonA = new JComboBox();
+        AutoCompletion.enable(tPersonA);
         gbc.gridx = 1;
         add(tPersonA, gbc);
 
@@ -62,7 +69,7 @@ public class AddShip extends JPanel {
         add(searchPersonA, gbc);
 
         searchPersonA.addActionListener(e -> {
-            searchPersonFetchImage(tPersonA.getText(), personAImage);
+            searchPersonFetchImage((String) tPersonA.getSelectedItem(), personAImage);
         });
 
         // Person A Image
@@ -78,7 +85,8 @@ public class AddShip extends JPanel {
         gbc.gridy = 3;
         add(personB, gbc);
 
-        tPersonB = new JTextField(15);
+        tPersonB = new JComboBox();
+        AutoCompletion.enable(tPersonB);
         gbc.gridx = 1;
         add(tPersonB, gbc);
 
@@ -87,7 +95,7 @@ public class AddShip extends JPanel {
         add(searchPersonB, gbc);
 
         searchPersonB.addActionListener(e -> {
-            searchPersonFetchImage(tPersonB.getText(), personBImage);
+            searchPersonFetchImage((String) tPersonB.getSelectedItem(), personBImage);
         });
 
         // Person B Image
@@ -114,15 +122,46 @@ public class AddShip extends JPanel {
         submit.addActionListener(e -> {
             submit();
         });
+
+        // Populate Person A & Person B JComboBox
+        for (Object person : people) {
+            tPersonA.addItem(person);
+            tPersonB.addItem(person);
+        }
+        tPersonA.setSelectedItem("");
+        tPersonB.setSelectedItem("");
+    }
+
+    private List<Object> fetchPeople() {
+        String query = "SELECT username FROM People";
+        List<Object> people = new ArrayList<>();
+        try {
+            Connection connect = Connect.createConnection();
+            Statement statement = connect.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+
+            while (rs.next()) {
+                people.add(rs.getString("username"));
+            }
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+        return people;
     }
 
     public void submit() {
+        if (tPersonA.getSelectedItem() == null || tPersonB.getSelectedItem() == null || tShipName.getText().isEmpty()) {
+            personFeedback.setText("Please fill in all fields.");
+            return;
+        }
+
         LocalDate currentDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDate = currentDate.format(formatter);
         String query = String.format(
                 "INSERT INTO Ships (username1, username2, date_posted, ship_name) VALUES ('%s', '%s', '%s', '%s');",
-                tPersonA.getText(), tPersonB.getText(), formattedDate, tShipName.getText());
+                tPersonA.getSelectedItem(), tPersonB.getSelectedItem(), formattedDate, tShipName.getText());
         try {
             Connection connect = Connect.createConnection();
             Statement statement = connect.createStatement();
@@ -181,8 +220,8 @@ public class AddShip extends JPanel {
 
     private void clearFields() {
         tShipName.setText("");
-        tPersonA.setText("");
-        tPersonB.setText("");
+        tPersonA.setSelectedItem("");
+        tPersonB.setSelectedItem("");
 
         // Clear images
         personAImage.setIcon(null);
