@@ -38,6 +38,7 @@ public class DrawerPanel extends JPanel {
         contentPanel.add(createShip);
 
         JButton comment = new JButton("Leave Comment");
+
         comment.setBackground(Color.PINK);
         comment.addActionListener(e -> mainFrame.showPage("Comment"));
         contentPanel.add(comment);
