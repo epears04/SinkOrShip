@@ -38,10 +38,12 @@ public class MainFrame extends JFrame {
         add(drawerPanel, BorderLayout.WEST);
 
         // Toggle button (outside drawer)
-        JButton toggleButton = new JButton("☰");
+        JButton toggleButton = new JButton("MENU");
+        toggleButton.setBackground(Color.PINK);
         toggleButton.addActionListener(e -> drawerPanel.toggleDrawer());
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.setBackground(Color.white);
         topPanel.add(toggleButton);
         add(topPanel, BorderLayout.NORTH);
 

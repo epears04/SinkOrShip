@@ -15,6 +15,7 @@ public class DrawerPanel extends JPanel {
         setBackground(Color.PINK);
 
         JButton toggleButton = new JButton("☰");
+        toggleButton.setBackground(Color.PINK);
         toggleButton.addActionListener(e -> toggleDrawer());
 
         // menu
@@ -22,19 +23,24 @@ public class DrawerPanel extends JPanel {
         contentPanel.setLayout(new GridLayout(4, 1));
 
         JButton viewShips = new JButton("View Ships");
+        viewShips.setBackground(Color.PINK);
         viewShips.addActionListener(e -> mainFrame.showPage("View"));
         contentPanel.add(viewShips);
 
         JButton createPerson = new JButton("Create Person");
+        createPerson.setBackground(Color.PINK);
         createPerson.addActionListener(e -> mainFrame.showPage("Person"));
         contentPanel.add(createPerson);
 
         JButton createShip = new JButton("Create Ship");
+        createShip.setBackground(Color.PINK);
         createShip.addActionListener(e -> mainFrame.showPage("Add"));
         contentPanel.add(createShip);
 
         JButton comment = new JButton("Leave Comment");
-        comment.addActionListener(e -> mainFrame.showPage("Comments"));
+
+        comment.setBackground(Color.PINK);
+        comment.addActionListener(e -> mainFrame.showPage("Comment"));
         contentPanel.add(comment);
 
         add(contentPanel, BorderLayout.CENTER);

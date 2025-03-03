@@ -3,7 +3,9 @@ package Views;
 import Database.Connect;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.sql.*;
+import java.util.jar.JarEntry;
 
 public class ViewShips extends JPanel {
 
@@ -21,20 +23,14 @@ public class ViewShips extends JPanel {
         JScrollPane scrollPane = new JScrollPane(panel);
         add(scrollPane, BorderLayout.CENTER);
 
-        // testing ships - will be connected to db soon!
-//        addShip("Jelena", "Justin", "Selena", "10-2-2024", 10);
-//        addShip("Bennifer", "Jennifer", "Ben", "2-3-2025", 11);
-//        addShip("Brangelina", "Angelina Jolie", "8-23-2012", "Brad Pitt", 8);
-//        addShip("Speidi", "Heidi Montag", "Spencer Pratt", "3-31-2025", 9);
-//        setVisible(true);
         fetchShips();
     }
 
     // make a ship component
-    private void addShip(String shipName, String p1, String p2, String date, int votes) {
+    private void addShip(int sid, String shipName, String p1, String p2, String date, int votes) {
         JPanel shipPanel = new JPanel(new BorderLayout());
         shipPanel.setLayout(new BoxLayout(shipPanel, BoxLayout.X_AXIS));
-        shipPanel.setSize(new Dimension(800, 100));
+        shipPanel.setPreferredSize(new Dimension(800, 100));
         shipPanel.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 30));
 
         // add ship name, people, and number of votes
@@ -79,6 +75,13 @@ public class ViewShips extends JPanel {
         JRadioButton downButton = new JRadioButton(downIcon);
         downButton.setSelectedIcon(downSelectedIcon);
 
+        upButton.addActionListener(e -> {
+            handleVote(sid, 1, votesLabel);
+        });
+        downButton.addActionListener(e -> {
+            handleVote(sid, -1, votesLabel);
+        });
+
         ButtonGroup shipButtonGroup = new ButtonGroup();
         shipButtonGroup.add(upButton);
         shipButtonGroup.add(downButton);
@@ -101,20 +104,59 @@ public class ViewShips extends JPanel {
     private void fetchShips() {
         try {
             Connection connect = Connect.createConnection();
-            String query = "SELECT s.username1, s.username2, s.date_posted, s.ship_name, COALESCE(sum(vote),0) AS votes " +
+            String query = "SELECT s.sid, s.username1, s.username2, s.date_posted, s.ship_name, COALESCE(sum(v.vote),0) AS votes " +
                     "FROM Ships s LEFT JOIN Votes v ON s.sid = v.sid " +
-                    "GROUP BY s.sid, s.username1, s.username2, s.date_posted, s.ship_name;";
+                    "GROUP BY s.sid, s.username1, s.username2, s.date_posted, s.ship_name " +
+                    "ORDER BY sum(v.vote) DESC;";
             PreparedStatement statement = connect.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
+                int sid = resultSet.getInt("sid");
                 String shipName = resultSet.getString("ship_name");
                 String username1 = resultSet.getString("username1");
                 String username2 = resultSet.getString("username2");
                 String date = resultSet.getString("date_posted");
                 int votes = resultSet.getInt("votes");
 
-                addShip(shipName, username1, username2, date, votes);
+                addShip(sid, shipName, username1, username2, date, votes);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void handleVote(int sid, int votes, JLabel votesLabel) {
+        String query = "INSERT INTO Votes (sid, vote, vDate) VALUES (?, ?, CURDATE())";
+
+        try {
+            Connection connect = Connect.createConnection();
+            PreparedStatement statement = connect.prepareStatement(query);
+            statement.setInt(1, sid); //set sid
+            statement.setInt(2, votes); //set vote
+            statement.executeUpdate();
+
+            updateVoteCount(sid, votesLabel);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void updateVoteCount(int sid, JLabel votesLabel) {
+        String query = "SELECT COALESCE(sum(vote),0) AS total_votes, sid" +
+                        " FROM Votes" +
+                        " WHERE sid = ?;";
+        try {
+            Connection connect = Connect.createConnection();
+            PreparedStatement statement = connect.prepareStatement(query);
+            statement.setInt(1, sid);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int updatedVotes = resultSet.getInt("total_votes");
+                votesLabel.setText("Votes: " + updatedVotes);
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
