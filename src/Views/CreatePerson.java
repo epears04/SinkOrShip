@@ -34,12 +34,23 @@ public class CreatePerson extends JPanel implements ActionListener {
         setBackground(backgroundColor);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 5, 10, 5); // Small padding
-        gbc.fill = GridBagConstraints.CENTER; // Expand components center
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Expand components horizontally
         gbc.ipadx = 0; // No extra width
         gbc.weightx = 0.1; // Keep labels small
         gbc.gridx = 0;
         gbc.gridy = 0;
 
+        // Create title label
+        JLabel titleLabel = new JLabel("Create a Person!");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24)); // Large, bold font
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center text
+        gbc.gridwidth = 2; // Span across both columns
+        gbc.insets = new Insets(0, 5, 5, 5);
+        gbc.weighty = 0.01;
+        gbc.anchor = GridBagConstraints.CENTER; // Center in the grid
+        add(titleLabel, gbc);
+        gbc.gridy++;
+        gbc.gridwidth = 1;
         // Name Label
         JLabel nameLabel = new JLabel("Username:");
         add(nameLabel, gbc);
