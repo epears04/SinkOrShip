@@ -7,8 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
-import java.util.Map;
-import java.util.*;
 
 public class ViewShips extends JPanel {
     private class ButtonActionListener implements ActionListener{

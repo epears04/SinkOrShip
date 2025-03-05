@@ -2,9 +2,9 @@ package MainPack;
 
 import Components.DrawerPanel;
 import Views.AddShip;
-import Views.CommentsPage;
 import Views.CreatePerson;
 import Views.ViewShips;
+import Views.ViewPeople;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +28,7 @@ public class MainFrame extends JFrame {
         mainPanel.add(new ViewShips(this), "View");
         mainPanel.add(new AddShip(), "Add");
         mainPanel.add(new CreatePerson(), "Person");
+        mainPanel.add(new ViewPeople(), "People");
 //        mainPanel.add(new CommentsPage("Sobear"), "Comments");
 
         // Show View Ships by default
