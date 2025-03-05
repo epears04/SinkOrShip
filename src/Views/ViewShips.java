@@ -37,47 +37,31 @@ public class ViewShips extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             int voteQuant = 0;
-            if(this.upButton == e.getSource() && prevSelectedButton == null){
-                //no selected -> up selected
-                // increment by 1
-                prevSelectedButton = upButton;
-                upButton.setIcon(upSelectedIcon);
-                voteQuant = 1;
-            }else if (this.downButton == e.getSource() && prevSelectedButton == null){
-                // no selected -> down selected
-                // increment by -1
+            JRadioButton sourceButton = (JRadioButton) e.getSource(); // Get the clicked button
+
+            if (prevSelectedButton == null) {
+                // No button selected -> Select the clicked button
+                prevSelectedButton = sourceButton;
+                voteQuant = (sourceButton == upButton) ? 1 : -1;
+            } else if (prevSelectedButton == upButton && sourceButton == downButton) {
+                // Switching from up to down
                 prevSelectedButton = downButton;
-                downButton.setIcon(downSelectedIcon);
-                voteQuant = -1;
-            }else if(prevSelectedButton == upButton && e.getSource() == downButton){
-                //switch from up -> down
-                //increment by -2
-                prevSelectedButton = downButton;
-                upButton.setIcon(upIcon);
-                downButton.setIcon(downSelectedIcon);
                 voteQuant = -2;
-            } else if (prevSelectedButton == downButton && e.getSource() == upButton) {
-                //switch from down -> up
-                // increment by 2
+            } else if (prevSelectedButton == downButton && sourceButton == upButton) {
+                // Switching from down to up
                 prevSelectedButton = upButton;
-                downButton.setIcon(downIcon);
-                upButton.setIcon(upSelectedIcon);
                 voteQuant = 2;
-            } else if(this.prevSelectedButton == e.getSource() && e.getSource() == downButton){
-                //deselect down
-                // increment by 1 to reset to 0
+            } else if (prevSelectedButton == sourceButton) {
+                // Deselecting the currently selected button
                 prevSelectedButton = null;
-                downButton.setSelected(false);
-                downButton.setIcon(downIcon);
-                voteQuant = 1;
-            } else if (this.prevSelectedButton == e.getSource() && e.getSource() == upButton) {
-                //deselect up
-                // increment by -1 to reset to 0
-                prevSelectedButton = null;
-                upButton.setSelected(false);
-                upButton.setIcon(upIcon);
-                voteQuant = -1;
+                voteQuant = (sourceButton == upButton) ? -1 : 1;
             }
+
+           // Update icons accordingly
+            upButton.setIcon(prevSelectedButton == upButton ? upSelectedIcon : upIcon);
+            downButton.setIcon(prevSelectedButton == downButton ? downSelectedIcon : downIcon);
+
+            // Call vote handling method
             handleVote(sid, voteQuant, votesLabel);
         }
     }
