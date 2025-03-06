@@ -27,10 +27,10 @@ public class DrawerPanel extends JPanel {
         viewShips.addActionListener(e -> mainFrame.showPage("View"));
         contentPanel.add(viewShips);
 
-        JButton comment = new JButton("View People");
-        comment.setBackground(Color.PINK);
-        comment.addActionListener(e -> mainFrame.showPage("Comment"));
-        contentPanel.add(comment);
+        JButton viewPeople = new JButton("View People");
+        viewPeople.setBackground(Color.PINK);
+        viewPeople.addActionListener(e -> mainFrame.showPage("ViewPeople"));
+        contentPanel.add(viewPeople);
 
         JButton createPerson = new JButton("Create Person");
         createPerson.setBackground(Color.PINK);

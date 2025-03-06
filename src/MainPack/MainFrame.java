@@ -26,10 +26,9 @@ public class MainFrame extends JFrame {
 
         // Add different pages
         mainPanel.add(new ViewShips(this), "View");
+        mainPanel.add(new ViewPeople(this), "ViewPeople");
         mainPanel.add(new AddShip(), "Add");
         mainPanel.add(new CreatePerson(), "Person");
-        mainPanel.add(new ViewPeople(), "People");
-//        mainPanel.add(new CommentsPage("Sobear"), "Comments");
 
         // Show View Ships by default
         cardLayout.show(mainPanel, "View");
