@@ -13,6 +13,10 @@ public class MainFrame extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private DrawerPanel drawerPanel;
+    private ViewShips viewShips;
+    private ViewPeople viewPeople;
+    private AddShip addShip;
+    private CreatePerson createPerson;
 
     public MainFrame(){
         setTitle("SinkorShip");
@@ -25,10 +29,14 @@ public class MainFrame extends JFrame {
         mainPanel = new JPanel(cardLayout);
 
         // Add different pages
-        mainPanel.add(new ViewShips(this), "View");
-        mainPanel.add(new ViewPeople(this), "ViewPeople");
-        mainPanel.add(new AddShip(), "Add");
-        mainPanel.add(new CreatePerson(), "Person");
+        viewShips = new ViewShips(this);
+        mainPanel.add(viewShips, "View");
+        viewPeople = new ViewPeople(this);
+        mainPanel.add(viewPeople, "ViewPeople");
+        addShip = new AddShip();
+        mainPanel.add(addShip, "Add");
+        createPerson = new CreatePerson();
+        mainPanel.add(createPerson, "Person");
 
         // Show View Ships by default
         cardLayout.show(mainPanel, "View");
@@ -52,6 +60,17 @@ public class MainFrame extends JFrame {
 
     // Method to switch pages
     public void showPage(String pageName) {
+        if (pageName.equals("View")) {
+            mainPanel.remove(viewShips);
+            viewShips = new ViewShips(this);
+            mainPanel.add(viewShips, pageName);
+        } else if (pageName.equals("ViewPeople")) {
+            mainPanel.remove(viewPeople);
+            viewPeople = new ViewPeople(this);
+            mainPanel.add(viewPeople, pageName);
+        }
+        revalidate();                 // Refresh layout
+        repaint();                    // Redraw UI
         cardLayout.show(mainPanel, pageName);
     }
 
