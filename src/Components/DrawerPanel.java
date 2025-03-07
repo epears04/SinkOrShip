@@ -27,6 +27,11 @@ public class DrawerPanel extends JPanel {
         viewShips.addActionListener(e -> mainFrame.showPage("View"));
         contentPanel.add(viewShips);
 
+        JButton viewPeople = new JButton("View People");
+        viewPeople.setBackground(Color.PINK);
+        viewPeople.addActionListener(e -> mainFrame.showPage("ViewPeople"));
+        contentPanel.add(viewPeople);
+
         JButton createPerson = new JButton("Create Person");
         createPerson.setBackground(Color.PINK);
         createPerson.addActionListener(e -> mainFrame.showPage("Person"));
@@ -36,11 +41,6 @@ public class DrawerPanel extends JPanel {
         createShip.setBackground(Color.PINK);
         createShip.addActionListener(e -> mainFrame.showPage("Add"));
         contentPanel.add(createShip);
-
-//        JButton comment = new JButton("Leave Comment");
-//        comment.setBackground(Color.PINK);
-//        comment.addActionListener(e -> mainFrame.showPage("Comment"));
-//        contentPanel.add(comment);
 
         add(contentPanel, BorderLayout.CENTER);
 
