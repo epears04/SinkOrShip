@@ -3,10 +3,16 @@ package Views;
 import Database.Connect;
 import MainPack.MainFrame;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.sql.*;
+import java.util.*;
 
 public class ViewShips extends JPanel {
     private class ButtonActionListener implements ActionListener{
@@ -84,7 +90,8 @@ public class ViewShips extends JPanel {
     }
 
     // make a ship component
-    private void addShip(int sid, String shipName, String p1, String p2, String date, int votes) {
+    private void addShip(int sid, String shipName, String p1, String p2, String date, int votes,
+                         BufferedImage img1, BufferedImage img2) {
         JPanel shipPanel = new JPanel(new BorderLayout());
         shipPanel.setLayout(new BoxLayout(shipPanel, BoxLayout.X_AXIS));
         shipPanel.setPreferredSize(new Dimension(800, 100));
@@ -105,6 +112,11 @@ public class ViewShips extends JPanel {
         labelPanel.add(dateLabel);
         labelPanel.add(Box.createVerticalStrut(5));
         labelPanel.add(votesLabel);
+
+        JPanel imagePanel = new JPanel();
+        imagePanel.setLayout(new FlowLayout());
+        addImage(imagePanel, img1, 100, 100);
+        addImage(imagePanel, img2, 100, 100);
 
         JPanel commentConnectionPanel = new JPanel();
         commentConnectionPanel.setLayout(new BoxLayout(commentConnectionPanel, BoxLayout.Y_AXIS));
@@ -156,54 +168,6 @@ public class ViewShips extends JPanel {
         upButton.addActionListener(actionListener);
         downButton.addActionListener(actionListener);
 
-//        final Map<JRadioButton, JRadioButton> prevSelectedButtonMap = new HashMap<>();
-//        prevSelectedButtonMap.put(upButton, null);
-//        prevSelectedButtonMap.put(downButton, null);
-
-//        ActionListener listener = new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                JRadioButton selectedButton = (JRadioButton) e.getSource();
-//                JRadioButton prevSelectedButton = prevSelectedButtonMap.get(selectedButton);
-//
-//                if (selectedButton == upButton) {
-//                    if (prevSelectedButton != upButton) {
-//                        handleVote(sid, 1, votesLabel);
-//                        prevSelectedButtonMap.put(upButton, upButton);
-//                        prevSelectedButtonMap.put(downButton, null); // Reset other button
-//                    } else {
-//                        handleVote(sid, 0, votesLabel);
-//                        prevSelectedButtonMap.put(upButton, null);
-//                    }
-//                } else if (selectedButton == downButton) {
-//                    if (prevSelectedButton != downButton) {
-//                        handleVote(sid, -1, votesLabel);
-//                        prevSelectedButtonMap.put(downButton, downButton);
-//                        prevSelectedButtonMap.put(upButton, null); // Reset other button
-//                    } else {
-//                        handleVote(sid, 0, votesLabel);
-//                        prevSelectedButtonMap.put(downButton, null);
-//                    }
-//                }
-//            }
-//        };
-
-//        ImageIcon finalUpSelectedIcon = upSelectedIcon;
-//        upButton.addActionListener(e->{
-//            if(!downButton.isEnabled()) handleVote(sid, 2, votesLabel);
-//            else handleVote(sid, 1, votesLabel);
-//            downButton.setEnabled(true);
-//            upButton.setEnabled(false);
-//            upButton.setDisabledIcon(finalUpSelectedIcon);
-//        });
-//        ImageIcon finalDownSelectedIcon = downSelectedIcon;
-//        downButton.addActionListener(e->{
-//            if(!upButton.isEnabled()) handleVote(sid, -2, votesLabel);
-//            else handleVote(sid, -1, votesLabel);
-//            downButton.setEnabled(false);
-//            upButton.setEnabled(true);
-//            downButton.setDisabledIcon(finalDownSelectedIcon);
-//        });
-
         ButtonGroup shipButtonGroup = new ButtonGroup();
         shipButtonGroup.add(upButton);
         shipButtonGroup.add(downButton);
@@ -214,6 +178,7 @@ public class ViewShips extends JPanel {
 
         // set up ship component
         shipPanel.add(labelPanel, BorderLayout.WEST);
+        shipPanel.add(imagePanel, BorderLayout.CENTER);
         shipPanel.add(commentConnectionPanel, BorderLayout.CENTER);
         shipPanel.add(votePanel, BorderLayout.EAST);
 
@@ -224,7 +189,19 @@ public class ViewShips extends JPanel {
         panel.repaint();
     }
 
+    private void addImage(JPanel panel, BufferedImage img, int width, int height) {
+        JLabel profile = new JLabel();
+        profile.setPreferredSize(new Dimension(width, height));
+        profile.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        Image scaledImg1 = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        ImageIcon icon1 = new ImageIcon(scaledImg1);
+        panel.add(profile);
+        profile.setIcon(icon1);
+        profile.setVisible(true);
+    }
+
     private void fetchShips() {
+        BufferedImage defaultProfile = getDefaultProfile();
         try {
             Connection connect = Connect.createConnection();
             String query = "SELECT s.sid, s.username1, s.username2, s.date_posted, s.ship_name, COALESCE(sum(v.vote),0) AS votes " +
@@ -240,13 +217,49 @@ public class ViewShips extends JPanel {
                 String username2 = resultSet.getString("username2");
                 String date = resultSet.getString("date_posted");
                 int votes = resultSet.getInt("votes");
-
-                addShip(sid, shipName, username1, username2, date, votes);
+                BufferedImage profile1 = fetchUsersImage(username1).orElse(defaultProfile);
+                BufferedImage profile2 = fetchUsersImage(username2).orElse(defaultProfile);
+                addShip(sid, shipName, username1, username2, date, votes, profile1, profile2);
             }
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private BufferedImage getDefaultProfile () {
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(new File("images/default_profile.png")); // eventually C:\\ImageTest\\pic2.jpg
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
+    private Optional<BufferedImage> fetchUsersImage(String person) {
+        String query = "SELECT username, profile_pic from People where username = \"" + person + "\";";
+        try {
+            Connection connect = Connect.createConnection();
+            Statement statement = connect.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+
+            if (rs.next()) {
+                Blob blob = rs.getBlob("profile_pic");
+                if (blob != null) {
+                    byte[] byteArr = blob.getBytes(1, (int) blob.length());
+
+                    // Convert byte array to Image
+                    ByteArrayInputStream bais = new ByteArrayInputStream(byteArr);
+                    BufferedImage img = ImageIO.read(bais);
+                    return Optional.of(img);
+                }
+            }
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+        return Optional.empty();
     }
 
     private void handleVote(int sid, int votes, JLabel votesLabel) {
