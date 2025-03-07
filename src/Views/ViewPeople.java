@@ -104,7 +104,14 @@ public class ViewPeople extends JPanel {
         JLabel majorLabel = new JLabel("Major: " + major, JLabel.CENTER);
         JLabel ageLabel = new JLabel("Age: " + age, JLabel.CENTER);
         JLabel genderLabel = new JLabel("Gender: " + gender, JLabel.CENTER);
-        JLabel descriptionLabel = new JLabel("Description: " + description, JLabel.CENTER );
+        JTextArea descriptionArea = new JTextArea("Description: " + description);
+        descriptionArea.setLineWrap(true);
+        descriptionArea.setWrapStyleWord(true);
+        descriptionArea.setEditable(false);
+        descriptionArea.setOpaque(false);
+        descriptionArea.setFont(new Font("Arial", Font.PLAIN, 12));
+        descriptionArea.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        descriptionArea.setMaximumSize(new Dimension(400, 60));
 
         // add info labels to box
         JPanel infoPanel = new JPanel();
@@ -117,12 +124,14 @@ public class ViewPeople extends JPanel {
         infoPanel.add(Box.createVerticalStrut(5));
         infoPanel.add(majorLabel);
         infoPanel.add(Box.createVerticalStrut(5));
-        infoPanel.add(descriptionLabel);
-        infoPanel.add(Box.createVerticalStrut(5));
+//        infoPanel.add(descriptionArea);
+//        infoPanel.add(Box.createVerticalStrut(5));
 
         personPanel.add(imagePanel, BorderLayout.WEST);
         personPanel.add(Box.createHorizontalStrut(30));
         personPanel.add(infoPanel, BorderLayout.CENTER);
+        personPanel.add(Box.createHorizontalStrut(10));
+        personPanel.add(descriptionArea, BorderLayout.EAST);
 
         // update people panel
         panel.add(personPanel);
