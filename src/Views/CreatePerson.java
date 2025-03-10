@@ -113,6 +113,9 @@ public class CreatePerson extends JPanel implements ActionListener {
         panel.add(maleButton);
         panel.add(femaleButton);
         panel.add(otherButton);
+        maleButton.setBackground(BACKGROUND_COLOR);
+        femaleButton.setBackground(BACKGROUND_COLOR);
+        otherButton.setBackground(BACKGROUND_COLOR);
         return panel;
     }
 
@@ -159,7 +162,7 @@ public class CreatePerson extends JPanel implements ActionListener {
     }
 
     private String getSQLInsert(String username, int age) {
-        String gender = maleButton.isSelected() ? "male" : femaleButton.isSelected() ? "female" : otherButton.isSelected() ? "other" : "none";
+        String gender = maleButton.isSelected() ? "Male" : femaleButton.isSelected() ? "Female" : otherButton.isSelected() ? "Other" : "None";
         return String.format("INSERT INTO People VALUES ('%s', %d, '%s', '%s', %s, '%s');",
                 username, age, majorField.getText(), gender, (uploadedImage == null ? "null" : "?"), personalDescriptionField.getText());
     }

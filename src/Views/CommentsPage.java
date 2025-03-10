@@ -23,6 +23,7 @@ public class CommentsPage extends JPanel implements ActionListener {
     private JButton saveButton;
     private static Color backgroundColor = new Color(223, 190, 239);
     private boolean visibility = false;
+    private JLabel noCommentsLabel = null;
 
     public CommentsPage(String shipName) {
         this.shipName = shipName;
@@ -151,6 +152,8 @@ public class CommentsPage extends JPanel implements ActionListener {
     }
 
     private void addPostedComment(String shipName, String commenter, String comment, String date) {
+        if (noCommentsLabel != null && noCommentsLabel.isVisible())
+                noCommentsLabel.setVisible(false);
         JPanel commentPanel = new JPanel(new BorderLayout());
         commentPanel.setLayout(new BoxLayout(commentPanel, BoxLayout.X_AXIS));
         commentPanel.setSize(new Dimension(800, 100));
@@ -178,7 +181,7 @@ public class CommentsPage extends JPanel implements ActionListener {
         commentLabel.setOpaque(false); // Make background transparent
         commentLabel.setEditable(false); // Prevent user editing
         commentLabel.setFont(new Font("Arial", Font.PLAIN, 14)); // Set font
-        commentLabel.setForeground(new Color(255, 169, 215)); // Set text color
+        commentLabel.setForeground(Color.BLACK); // Set text color
         commentLabel.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 45));
 
 
@@ -219,7 +222,7 @@ public class CommentsPage extends JPanel implements ActionListener {
             PreparedStatement statement = connect.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
             if(!resultSet.isBeforeFirst()){
-                JLabel noCommentsLabel = new JLabel("No comments found");
+                noCommentsLabel = new JLabel("No comments found");
                 noCommentsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
                 noCommentsLabel.setForeground(Color.GRAY);
                 panel.add(noCommentsLabel, BorderLayout.NORTH);
