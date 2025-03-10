@@ -5,7 +5,6 @@ import MainPack.MainFrame;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
-import java.io.*;
 
 public class ViewPeople extends JPanel {
 
@@ -124,8 +123,6 @@ public class ViewPeople extends JPanel {
         infoPanel.add(Box.createVerticalStrut(5));
         infoPanel.add(majorLabel);
         infoPanel.add(Box.createVerticalStrut(5));
-//        infoPanel.add(descriptionArea);
-//        infoPanel.add(Box.createVerticalStrut(5));
 
         personPanel.add(imagePanel, BorderLayout.WEST);
         personPanel.add(Box.createHorizontalStrut(30));

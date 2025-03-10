@@ -86,6 +86,13 @@ public class ViewShips extends JPanel {
         JScrollPane scrollPane = new JScrollPane(panel);
         add(scrollPane, BorderLayout.CENTER);
 
+        //add title
+        JLabel title = new JLabel("Ships");
+        title.setFont(new Font("Arial", Font.BOLD, 24));
+        panel.add(title, BorderLayout.CENTER); //need to make this align center
+        panel.add(Box.createVerticalStrut(30));
+
+
         fetchShips();
     }
 

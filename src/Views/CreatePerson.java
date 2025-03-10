@@ -189,5 +189,6 @@ public class CreatePerson extends JPanel implements ActionListener {
         personalDescriptionField.setText("");
         genderGroup.clearSelection();
         uploadedLabel.setVisible(false);
+        uploadedImage = null;
     }
 }
