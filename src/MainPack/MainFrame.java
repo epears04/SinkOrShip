@@ -69,6 +69,11 @@ public class MainFrame extends JFrame {
             viewPeople = new ViewPeople(this);
             mainPanel.add(viewPeople, pageName);
         }
+        else if (pageName.equals("Add")){
+            mainPanel.remove(addShip);
+            addShip = new AddShip();
+            mainPanel.add(addShip, pageName);
+        }
         revalidate();                 // Refresh layout
         repaint();                    // Redraw UI
         cardLayout.show(mainPanel, pageName);
